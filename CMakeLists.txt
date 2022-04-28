@@ -43,6 +43,10 @@ FetchAddSub( shadowmitia_libqoi
 	GIT_REPOSITORY https://github.com/ShadowMitia/libqoi.git
 	GIT_TAG cc2b8967a9d2c4754e35d67d9ee9d9613e7cbbe0 # 2022.01.13
 )
+FetchAddSub( wx257osn2_qoixx
+	GIT_REPOSITORY https://github.com/wx257osn2/qoixx.git
+	GIT_TAG 72cbaa530df7c7bdecf8b13b49060f485c8c661b # 2022.02.23
+)
 FetchMakeAvail( Catch2
 	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
 	GIT_TAG 62fd660583d3ae7a7886930b413c3c570e89786c # v2.13.9
@@ -52,9 +56,11 @@ AddLib( phoboslab_qoi_impl test/phoboslab_qoi.cpp phoboslab::qoi )
 AddLib( pfusik_qoici_c_impl test/pfusik_qoici_c.cpp pfusik::qoici::c )
 AddLib( pfusik_qoici_cpp_impl test/pfusik_qoici_cpp.cpp pfusik::qoici::cpp )
 AddLib( shadowmitia_libqoi_impl test/shadowmitia_libqoi.cpp shadowmitia::libqoi )
+AddLib( wx257osn2_qoixx_impl test/wx257osn2_qoixx.cpp wx257osn2::qoixx )
 
 add_executable( bench test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
+	wx257osn2_qoixx_impl
 	shadowmitia_libqoi_impl
 	pfusik_qoici_c_impl
 	pfusik_qoici_cpp_impl
