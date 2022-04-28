@@ -17,7 +17,7 @@ macro( FetchAddSub #[[LibName FetchOptions...]] )
 	FetchContent_Declare( ${ARGV} )
 	FetchContent_Populate( ${ARGV0} )
 	file( REMOVE ${${ARGV0}_SOURCE_DIR}/CMakeLists.txt )
-	file( COPY ${ARGV0}.cmake DESTINATION ${${ARGV0}_SOURCE_DIR} )
+	file( COPY ext/ DESTINATION ${${ARGV0}_SOURCE_DIR} FILES_MATCHING PATTERN ${ARGV0}* )
 	file( RENAME ${${ARGV0}_SOURCE_DIR}/${ARGV0}.cmake ${${ARGV0}_SOURCE_DIR}/CMakeLists.txt )
 	add_subdirectory( ${${ARGV0}_SOURCE_DIR} ${${ARGV0}_BINARY_DIR} )
 endmacro()
@@ -25,3 +25,24 @@ macro( FetchMakeAvail #[[LibName FetchOptions...]] )
 	FetchContent_Declare( ${ARGV} )
 	FetchContent_MakeAvailable( ${ARGV0} )
 endmacro()
+macro( AddLib #[[LibName LibSource LinkLibName]])
+	add_library( ${ARGV0} ${ARGV1} )
+	target_link_libraries( ${ARGV0} PRIVATE ${ARGV2} )
+	target_compile_features( ${ARGV0} PUBLIC cxx_std_17 )
+endmacro()
+
+FetchAddSub( phoboslab_qoi
+	GIT_REPOSITORY https://github.com/phoboslab/qoi.git
+	GIT_TAG 6d7eadd28c0be90e36a853a7bbb1782e50a0e08f # 2022.04.25
+)
+FetchMakeAvail( Catch2
+	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+	GIT_TAG 62fd660583d3ae7a7886930b413c3c570e89786c # v2.13.9
+)
+
+AddLib( phoboslab_qoi_impl test/phoboslab_qoi.cpp phoboslab::qoi )
+
+add_executable( bench test/benchmain.cpp )
+target_link_libraries( bench PRIVATE
+	phoboslab_qoi_impl )
+target_link_libraries( bench PRIVATE Catch2::Catch2 )
