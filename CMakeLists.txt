@@ -35,14 +35,22 @@ FetchAddSub( phoboslab_qoi
 	GIT_REPOSITORY https://github.com/phoboslab/qoi.git
 	GIT_TAG 6d7eadd28c0be90e36a853a7bbb1782e50a0e08f # 2022.04.25
 )
+FetchAddSub( pfusik_qoici
+	GIT_REPOSITORY https://github.com/pfusik/qoi-ci.git
+	GIT_TAG d146811f3c9b9598b3bf6ab50fa5272256733b77 # 1.1.1 release.
+)
 FetchMakeAvail( Catch2
 	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
 	GIT_TAG 62fd660583d3ae7a7886930b413c3c570e89786c # v2.13.9
 )
 
 AddLib( phoboslab_qoi_impl test/phoboslab_qoi.cpp phoboslab::qoi )
+AddLib( pfusik_qoici_c_impl test/pfusik_qoici_c.cpp pfusik::qoici::c )
+AddLib( pfusik_qoici_cpp_impl test/pfusik_qoici_cpp.cpp pfusik::qoici::cpp )
 
 add_executable( bench test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
+	pfusik_qoici_c_impl
+	pfusik_qoici_cpp_impl
 	phoboslab_qoi_impl )
 target_link_libraries( bench PRIVATE Catch2::Catch2 )
