@@ -70,12 +70,10 @@ namespace shraiwi::miniqoi
 namespace c
 {
 std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc);
 } // namespace c
 namespace cpp
 {
 std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc);
 } // namespace cpp
 } // namespace shraiwi::miniqoi
 
