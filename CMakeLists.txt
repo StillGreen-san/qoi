@@ -73,10 +73,10 @@ FetchAddSub( wx257osn2_qoixx
 	GIT_REPOSITORY https://github.com/wx257osn2/qoixx.git
 	GIT_TAG 72cbaa530df7c7bdecf8b13b49060f485c8c661b # 2022.02.23
 )
-FetchAddSub( shraiwi_miniqoi
-	GIT_REPOSITORY https://github.com/shraiwi/mini-qoi.git
-	GIT_TAG 281ffd0ee20a4d85cad4b156be07181a6e8b3a60 # v1.0.0
-)
+#FetchAddSub( shraiwi_miniqoi
+#	GIT_REPOSITORY https://github.com/shraiwi/mini-qoi.git
+#	GIT_TAG 281ffd0ee20a4d85cad4b156be07181a6e8b3a60 # v1.0.0
+#)
 FetchMakeAvail( Catch2
 	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
 	GIT_TAG 62fd660583d3ae7a7886930b413c3c570e89786c # v2.13.9
@@ -90,13 +90,14 @@ AddLib( pfusik_qoici_c_impl test/pfusik_qoici_c.cpp pfusik::qoici::c )
 AddLib( pfusik_qoici_cpp_impl test/pfusik_qoici_cpp.cpp pfusik::qoici::cpp )
 AddLib( shadowmitia_libqoi_impl test/shadowmitia_libqoi.cpp shadowmitia::libqoi )
 AddLib( wx257osn2_qoixx_impl test/wx257osn2_qoixx.cpp wx257osn2::qoixx )
-AddLib( shraiwi_miniqoi_c_impl test/shraiwi_miniqoi_c.cpp shraiwi::miniqoi::c )
-AddLib( shraiwi_miniqoi_cpp_impl test/shraiwi_miniqoi_cpp.cpp shraiwi::miniqoi::cpp )
+#AddLib( shraiwi_miniqoi_c_impl test/shraiwi_miniqoi_c.cpp shraiwi::miniqoi::c )
+#AddLib( shraiwi_miniqoi_cpp_impl test/shraiwi_miniqoi_cpp.cpp shraiwi::miniqoi::cpp )
+# TODO unresolved symbols mqoi_desc_done, mqoi_dec_done & __builtin_bswap32
 
 add_executable( bench test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
-	shraiwi_miniqoi_c_impl
-	shraiwi_miniqoi_cpp_impl
+#	shraiwi_miniqoi_c_impl
+#	shraiwi_miniqoi_cpp_impl
 	wx257osn2_qoixx_impl
 	shadowmitia_libqoi_impl
 	pfusik_qoici_c_impl
