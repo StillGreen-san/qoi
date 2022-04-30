@@ -22,19 +22,19 @@ struct ImageDescription
 	uint8_t channels;
 	uint8_t colorspace;
 };
-bool alpha(uint8_t channels)
+inline bool alpha(uint8_t channels)
 {
 	return channels == 4;
 }
-bool linear(uint8_t colorspace)
+inline bool linear(uint8_t colorspace)
 {
 	return colorspace == 1;
 }
-uint8_t channels(bool alpha)
+inline uint8_t channels(bool alpha)
 {
 	return alpha ? 4 : 3;
 }
-uint8_t colorspace(bool linear)
+inline uint8_t colorspace(bool linear)
 {
 	return linear ? 1 : 0;
 }
@@ -65,17 +65,17 @@ std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
 std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc);
 } // namespace shadowmitia::libqoi
 
-namespace shraiwi::miniqoi
-{
-namespace c
-{
-std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-} // namespace c
-namespace cpp
-{
-std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-} // namespace cpp
-} // namespace shraiwi::miniqoi
+//namespace shraiwi::miniqoi
+//{
+//namespace c
+//{
+//std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
+//} // namespace c
+//namespace cpp
+//{
+//std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
+//} // namespace cpp
+//} // namespace shraiwi::miniqoi
 
 namespace wx257osn2::qoixx
 {

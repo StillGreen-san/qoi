@@ -94,6 +94,8 @@ AddLib( wx257osn2_qoixx_impl test/wx257osn2_qoixx.cpp wx257osn2::qoixx )
 #AddLib( shraiwi_miniqoi_cpp_impl test/shraiwi_miniqoi_cpp.cpp shraiwi::miniqoi::cpp )
 # TODO unresolved symbols mqoi_desc_done, mqoi_dec_done & __builtin_bswap32
 
+AddLib( test_data test/testdata.cpp )
+
 add_executable( bench test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
 #	shraiwi_miniqoi_c_impl
@@ -103,5 +105,5 @@ target_link_libraries( bench PRIVATE
 	pfusik_qoici_c_impl
 	pfusik_qoici_cpp_impl
 	phoboslab_qoi_impl )
-target_link_libraries( bench PRIVATE Catch2::Catch2 qoi_test_images )
+target_link_libraries( bench PRIVATE Catch2::Catch2 qoi_test_images test_data )
 PostBuildImageCopy( bench qoi_test_images )
