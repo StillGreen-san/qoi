@@ -20,6 +20,7 @@ struct Decoder : public IImageData
 		uint32_t w, h;
 		::mqoi_desc_verify(&description, &w, &h);
 
+		::mqoi_dec_t decoder;
 		::mqoi_dec_init(&decoder, w * h);
 		pixels = new uint8_t[w * h * description.channels];
 		uint8_t* rawIt = pixels;
@@ -68,7 +69,6 @@ struct Decoder : public IImageData
 		delete[] pixels;
 	}
 	::mqoi_desc_t description;
-	::mqoi_dec_t decoder;
 	uint8_t* pixels;
 };
 

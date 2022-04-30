@@ -2,7 +2,7 @@
 
 #include <qoi.hpp>
 
-namespace impl::shadowmitia
+namespace impl::shadowmitia::libqoi
 {
 struct Decoder : public IImageData
 {
@@ -81,4 +81,4 @@ std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageD
 {
 	return std::make_unique<Encoder>(raw, desc);
 }
-} // namespace impl::shadowmitia
+} // namespace impl::shadowmitia::libqoi

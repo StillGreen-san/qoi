@@ -2,15 +2,84 @@
 
 #include <qoixx.hpp>
 
-void encode()
+namespace impl::wx257osn2::qoixx
 {
-	std::vector<unsigned char> pix;
-	qoixx::qoi::desc desc{0,0,4,qoixx::qoi::colorspace::linear};
-	auto res = qoixx::qoi::encode<std::vector<std::uint8_t>>(pix, desc);
-//	auto enc = qoixx::qoi::encode<std::pair<std::unique_ptr<uint8_t[]>, std::size_t>>(data, 0, desc);
-}
-void decode()
+struct Decoder : public IImageData
 {
-	std::vector<unsigned char> dat;
-	auto res = qoixx::qoi::decode<std::vector<std::uint8_t>>(dat, 4);
+	Decoder() = delete;
+	Decoder(const std::vector<uint8_t>& qoi) : pixels{::qoixx::qoi::decode<std::vector<uint8_t>>(qoi)}
+	{
+	}
+	const uint8_t* data() override
+	{
+		return pixels.first.data();
+	}
+	size_t size() override
+	{
+		return pixels.first.size();
+	}
+	uint32_t width() override
+	{
+		return pixels.second.width;
+	}
+	uint32_t height() override
+	{
+		return pixels.second.height;
+	}
+	uint8_t channels() override
+	{
+		return pixels.second.channels;
+	}
+	uint8_t colorspace() override
+	{
+		return static_cast<uint8_t>(pixels.second.colorspace);
+	}
+	std::pair<std::vector<uint8_t>, ::qoixx::qoi::desc> pixels;
+};
+struct Encoder : public IImageData
+{
+	Encoder() = delete;
+	Encoder(const std::vector<uint8_t>& raw, ImageDescription description) : header{description}
+	{
+		::qoixx::qoi::desc desc{description.width, description.height, description.channels,
+		    static_cast<::qoixx::qoi::colorspace>(description.channels)};
+		pixels = ::qoixx::qoi::encode<std::vector<std::uint8_t>>(raw, desc);
+	}
+	const uint8_t* data() override
+	{
+		return pixels.data();
+	}
+	size_t size() override
+	{
+		return pixels.size();
+	}
+	uint32_t width() override
+	{
+		return header.width;
+	}
+	uint32_t height() override
+	{
+		return header.height;
+	}
+	uint8_t channels() override
+	{
+		return header.channels;
+	}
+	uint8_t colorspace() override
+	{
+		return header.colorspace;
+	}
+	std::vector<uint8_t> pixels;
+	ImageDescription header;
+};
+
+std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi)
+{
+	return std::make_unique<Decoder>(qoi);
 }
+
+std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc)
+{
+	return std::make_unique<Encoder>(raw, desc);
+}
+} // namespace impl::wx257osn2::qoixx

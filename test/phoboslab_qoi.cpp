@@ -2,7 +2,7 @@
 
 #include <qoi.h>
 
-namespace impl::phoboslab
+namespace impl::phoboslab::qoi
 {
 struct Decoder : public IImageData
 {
@@ -90,4 +90,4 @@ std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageD
 {
 	return std::make_unique<Encoder>(raw, desc);
 }
-} // namespace impl::phoboslab
+} // namespace impl::phoboslab::qoi
