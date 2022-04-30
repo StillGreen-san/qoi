@@ -30,6 +30,32 @@ macro( AddLib #[[LibName LibSource LinkLibName]])
 	target_link_libraries( ${ARGV0} PRIVATE ${ARGV2} )
 	target_compile_features( ${ARGV0} PUBLIC cxx_std_17 )
 endmacro()
+macro( PostBuildImageCopy #[[LibTarget ImageTarget]])
+	add_custom_command(
+		TARGET ${ARGV0} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/wikipedia_008.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/dice.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/kodim10.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/kodim23.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/qoi_logo.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/testcard.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${${ARGV1}_SOURCE_DIR}/testcard_rgba.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+	)
+endmacro()
 
 FetchAddSub( phoboslab_qoi
 	GIT_REPOSITORY https://github.com/phoboslab/qoi.git
@@ -55,6 +81,9 @@ FetchMakeAvail( Catch2
 	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
 	GIT_TAG 62fd660583d3ae7a7886930b413c3c570e89786c # v2.13.9
 )
+FetchAddSub( qoi_test_images
+	URL https://qoiformat.org/qoi_test_images.zip
+)
 
 AddLib( phoboslab_qoi_impl test/phoboslab_qoi.cpp phoboslab::qoi )
 AddLib( pfusik_qoici_c_impl test/pfusik_qoici_c.cpp pfusik::qoici::c )
@@ -73,4 +102,5 @@ target_link_libraries( bench PRIVATE
 	pfusik_qoici_c_impl
 	pfusik_qoici_cpp_impl
 	phoboslab_qoi_impl )
-target_link_libraries( bench PRIVATE Catch2::Catch2 )
+target_link_libraries( bench PRIVATE Catch2::Catch2 qoi_test_images )
+PostBuildImageCopy( bench qoi_test_images )
