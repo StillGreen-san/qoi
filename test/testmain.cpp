@@ -1,6 +1,7 @@
 #include "sgs/qoi.hpp"
 #include "testdata.hpp"
 
+#include <array>
 #include <ostream>
 
 bool operator==(const sgs::qoi::Header& sgsHeader, const impl::ImageDescription& testHeader) noexcept
@@ -24,6 +25,27 @@ std::ostream& operator<<(std::ostream& oStrm, impl::ImageDescription const& valu
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
+
+TEST_CASE("helper")
+{
+	using sgs::qoi::helpers::pushByte;
+
+	uint32_t value = 0;
+	value = pushByte(value, 0x01);
+	REQUIRE(value == 0x01);
+
+	value = pushByte(value, 0x10);
+	REQUIRE(value == 0x0110);
+
+	value = pushByte(value, 0xff);
+	REQUIRE(value == 0x0110ff);
+
+	using sgs::qoi::helpers::isLittleEndian;
+	using sgs::qoi::helpers::read32BE;
+	std::array<uint8_t, 4> bytes{0xAA, 0xBB, 0xCC, 0xDD};
+
+	REQUIRE(read32BE(bytes.begin()) == 0xAABBCCDD);
+}
 
 TEST_CASE("readHeader")
 {

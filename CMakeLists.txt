@@ -99,6 +99,7 @@ AddLib( wx257osn2_qoixx_impl test/wx257osn2_qoixx.cpp wx257osn2::qoixx )
 add_library( sgs_qoi INTERFACE )
 add_library( sgs::qoi ALIAS sgs_qoi )
 target_compile_features( sgs_qoi INTERFACE cxx_std_17 )
+target_compile_definitions( sgs_qoi INTERFACE $<$<STREQUAL:${CMAKE_CXX_BYTE_ORDER},BIG_ENDIAN>:CMAKE_CXX_BIG_ENDIAN> )
 target_include_directories( sgs_qoi INTERFACE lib )
 
 AddLib( test_data test/testdata.cpp phoboslab_qoi_impl )

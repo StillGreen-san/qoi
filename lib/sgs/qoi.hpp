@@ -2,10 +2,55 @@
 
 #include <cstdint>
 
+#include <algorithm>
+#include <exception> // TODO do without?
+#include <iterator>
 #include <vector>
+
+// TODO constrain templates
+// TODO optimizations for continues storage
 
 namespace sgs::qoi
 {
+namespace constants
+{
+constexpr size_t headerSize = 14;
+constexpr size_t magicBytes = 4;
+} // namespace constants
+namespace helpers
+{
+#ifdef CMAKE_CXX_BIG_ENDIAN
+constexpr bool isLittleEndian = false;
+#else
+constexpr bool isLittleEndian = true;
+#endif
+
+template<typename TResult, typename TInt>
+inline TResult pushByte(TResult value, TInt byte)
+{
+	value <<= 8U;
+	return value | byte;
+}
+
+template<typename TIterator>
+uint32_t read32BE(TIterator it)
+{
+	if constexpr(isLittleEndian)
+	{
+		uint32_t value = 0;
+		value = pushByte(value, *it++);
+		value = pushByte(value, *it++);
+		value = pushByte(value, *it++);
+		value = pushByte(value, *it);
+		return value;
+	}
+	else
+	{
+		return *reinterpret_cast<const uint32_t*>(&*it);
+	}
+}
+} // namespace helpers
+
 enum class Channels : uint8_t
 {
 	RGB = 3,
@@ -18,7 +63,7 @@ enum class Colorspace : uint8_t
 };
 struct Header
 {
-	static constexpr char magic[4]{'q', 'o', 'i', 'f'};
+	static constexpr uint8_t magic[constants::magicBytes]{'q', 'o', 'i', 'f'};
 	uint32_t width{0};
 	uint32_t height{0};
 	Channels channels{Channels::RGBA};
@@ -33,16 +78,37 @@ struct DataPair
 
 using DataVector = std::vector<uint8_t>; // TODO make templates and remove direct vector dependency
 
-Header readHeader([[maybe_unused]] const DataVector& qoiData)
+Header readHeader(const DataVector& qoiData)
 {
-	// check size : min 14bytes
-	// check for magic bytes
-	// read dimensions accounting for endianness
-	// read channels & colorspace
-	return {};
+	if(qoiData.size() < constants::headerSize)
+	{
+		throw std::exception{"insufficient data"};
+	}
+
+	auto qoiIt = next(cbegin(qoiData), constants::magicBytes);
+
+	if(!std::equal(cbegin(qoiData), qoiIt, std::cbegin(Header::magic)))
+	{
+		throw std::exception{"magic bytes mismatch"};
+	}
+
+	Header header;
+
+	header.width = helpers::read32BE(qoiIt);
+	std::advance(qoiIt, 4);
+
+	header.height = helpers::read32BE(qoiIt);
+	std::advance(qoiIt, 4);
+
+	header.channels = static_cast<Channels>(*qoiIt);
+	std::advance(qoiIt, 1);
+
+	header.colorspace = static_cast<Colorspace>(*qoiIt);
+
+	return header;
 }
 
-//DataPair<DataVector> decode(const DataVector& qoiData);
+// DataPair<DataVector> decode(const DataVector& qoiData);
 
 // Header readHeader(const TData& qoiData);
 // TDataPair<TData> decode(const TData& qoiData);
