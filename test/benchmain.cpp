@@ -37,7 +37,7 @@ TEST_CASE("decode bench")
 	QOI_BENCH_DECODE(shadowmitia::libqoi::decode);
 //	QOI_BENCH_DECODE(shraiwi::miniqoi::c::decode);
 //	QOI_BENCH_DECODE(shraiwi::miniqoi::cpp::decode);
-	QOI_BENCH_DECODE(wx257osn2::qoixx::decode);
+	QOI_BENCH_DECODE(wx257osn2::qoixx::decode); // TODO insufficient input data
 }
 
 TEST_CASE("encode bench")
@@ -46,8 +46,8 @@ TEST_CASE("encode bench")
 	TestData testData;
 
 	QOI_BENCH_ENCODE(phoboslab::qoi::encode);
-	QOI_BENCH_ENCODE(pfusik::qoici::c::encode);
-	QOI_BENCH_ENCODE(pfusik::qoici::cpp::encode);
+//	QOI_BENCH_ENCODE(pfusik::qoici::c::encode); // TODO assumes rgba fails on rgb
+//	QOI_BENCH_ENCODE(pfusik::qoici::cpp::encode);
 	QOI_BENCH_ENCODE(shadowmitia::libqoi::encode);
 //	QOI_BENCH_ENCODE(shraiwi::miniqoi::c::decode);
 //	QOI_BENCH_ENCODE(shraiwi::miniqoi::cpp::decode);

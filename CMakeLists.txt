@@ -1,6 +1,8 @@
 cmake_minimum_required( VERSION 3.20 )
 
 project( qoi CXX C )
+# TODO make tests & benchmark optional
+# TODO check if cxx_std can be lowered
 
 option( WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF )
 option( ENABLE_CPPCHECK "Enable static analysis with cppcheck" OFF )
@@ -94,7 +96,16 @@ AddLib( wx257osn2_qoixx_impl test/wx257osn2_qoixx.cpp wx257osn2::qoixx )
 #AddLib( shraiwi_miniqoi_cpp_impl test/shraiwi_miniqoi_cpp.cpp shraiwi::miniqoi::cpp )
 # TODO unresolved symbols mqoi_desc_done, mqoi_dec_done & __builtin_bswap32
 
-AddLib( test_data test/testdata.cpp )
+add_library( sgs_qoi INTERFACE )
+add_library( sgs::qoi ALIAS sgs_qoi )
+target_compile_features( sgs_qoi INTERFACE cxx_std_17 )
+target_include_directories( sgs_qoi INTERFACE lib )
+
+AddLib( test_data test/testdata.cpp phoboslab_qoi_impl )
+
+add_executable( sgs_qoi_test test/testmain.cpp )
+target_link_libraries( sgs_qoi_test PRIVATE sgs::qoi test_data Catch2::Catch2)
+PostBuildImageCopy( sgs_qoi_test qoi_test_images )
 
 add_executable( bench test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
