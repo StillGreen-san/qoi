@@ -17,6 +17,32 @@ namespace constants
 constexpr size_t headerSize = 14;
 constexpr size_t magicBytes = 4;
 } // namespace constants
+
+enum class Channels : uint8_t
+{
+	RGB = 3,
+	RGBA = 4
+};
+enum class Colorspace : uint8_t
+{
+	sRGB = 0,
+	Linear = 1
+};
+struct Header
+{
+	static constexpr uint8_t magic[constants::magicBytes]{'q', 'o', 'i', 'f'};
+	uint32_t width{0};
+	uint32_t height{0};
+	Channels channels{Channels::RGBA};
+	Colorspace colorspace{Colorspace::Linear};
+};
+template<typename TData>
+struct DataPair
+{
+	Header header;
+	TData data;
+};
+
 namespace helpers
 {
 #ifdef CMAKE_CXX_BIG_ENDIAN
@@ -49,32 +75,20 @@ uint32_t read32BE(TIterator it)
 		return *reinterpret_cast<const uint32_t*>(&*it);
 	}
 }
-} // namespace helpers
 
-enum class Channels : uint8_t
+size_t bufferSize(const Header& header)
 {
-	RGB = 3,
-	RGBA = 4
-};
-enum class Colorspace : uint8_t
+	return header.width * header.height * static_cast<size_t>(header.channels);
+}
+
+struct Pixel
 {
-	sRGB = 0,
-	Linear = 1
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+	uint8_t alpha;
 };
-struct Header
-{
-	static constexpr uint8_t magic[constants::magicBytes]{'q', 'o', 'i', 'f'};
-	uint32_t width{0};
-	uint32_t height{0};
-	Channels channels{Channels::RGBA};
-	Colorspace colorspace{Colorspace::Linear};
-};
-template<typename TData>
-struct DataPair
-{
-	Header header;
-	TData data;
-};
+} // namespace helpers
 
 using DataVector = std::vector<uint8_t>; // TODO make templates and remove direct vector dependency
 
@@ -108,7 +122,14 @@ Header readHeader(const DataVector& qoiData)
 	return header;
 }
 
-// DataPair<DataVector> decode(const DataVector& qoiData);
+DataPair<DataVector> decode(const DataVector& qoiData)
+{
+	DataPair<DataVector> dataPair{readHeader(qoiData)};
+	dataPair.data.reserve(helpers::bufferSize(dataPair.header));
+	// decode
+	//
+	return dataPair;
+}
 
 // Header readHeader(const TData& qoiData);
 // TDataPair<TData> decode(const TData& qoiData);
