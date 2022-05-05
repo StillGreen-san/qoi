@@ -16,7 +16,7 @@ namespace sgs::qoi
 namespace constants
 {
 constexpr size_t headerSize = 14;
-constexpr size_t endMarkerSize = 14;
+constexpr size_t endMarkerSize = 8;
 constexpr size_t magicBytes = 4;
 constexpr size_t previousPixelsSize = 64;
 constexpr uint8_t tagRGB = 0b11111110;
@@ -167,7 +167,7 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
 	helpers::Pixel lastPixel{0, 0, 0, 255};
 
-	while(qoiIt != qoiEnd) // TODO handle corrupted data (chunks of wrong size)
+	for(size_t target = dataPair.data.capacity(); qoiIt != qoiEnd && dataPair.data.size() < target;) // TODO handle corrupted data (chunks of wrong size)
 	{
 		if(qoiIt[0] == constants::tagRGB)
 		{
@@ -202,7 +202,7 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 			break;
 		case constants::tagLuma:
 		{
-			const uint8_t greenDiff = qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2) - 32U;
+			const uint8_t greenDiff = (qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2)) - 32U;
 			lastPixel = helpers::Pixel{
 			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
 			    static_cast<uint8_t>(lastPixel.green + greenDiff),
