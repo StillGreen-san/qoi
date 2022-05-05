@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include <algorithm>
+#include <array>
 #include <exception> // TODO do without?
 #include <iterator>
 #include <vector>
@@ -15,7 +16,16 @@ namespace sgs::qoi
 namespace constants
 {
 constexpr size_t headerSize = 14;
+constexpr size_t endMarkerSize = 14;
 constexpr size_t magicBytes = 4;
+constexpr size_t previousPixelsSize = 64;
+constexpr uint8_t tagRGB = 0b11111110;
+constexpr uint8_t tagRGBA = 0b11111111;
+constexpr uint8_t tagMask2 = 0b11000000;
+constexpr uint8_t tagIndex = 0b00000000;
+constexpr uint8_t tagDiff = 0b01000000;
+constexpr uint8_t tagLuma = 0b10000000;
+constexpr uint8_t tagRun = 0b11000000;
 } // namespace constants
 
 enum class Channels : uint8_t
@@ -59,7 +69,7 @@ inline TResult pushByte(TResult value, TInt byte)
 }
 
 template<typename TIterator>
-uint32_t read32BE(TIterator it)
+inline uint32_t read32BE(TIterator it)
 {
 	if constexpr(isLittleEndian)
 	{
@@ -76,7 +86,7 @@ uint32_t read32BE(TIterator it)
 	}
 }
 
-size_t bufferSize(const Header& header)
+inline size_t bufferSize(const Header& header)
 {
 	return header.width * header.height * static_cast<size_t>(header.channels);
 }
@@ -88,6 +98,25 @@ struct Pixel
 	uint8_t blue;
 	uint8_t alpha;
 };
+
+template<typename TContainer>
+inline void push_back(DataPair<TContainer>& dataPair, Pixel pixel)
+{
+	dataPair.data.insert(end(dataPair.data), &pixel.red, &pixel.red + static_cast<size_t>(dataPair.header.channels));
+}
+template<typename TContainer>
+inline void push_back(DataPair<TContainer>& dataPair, Pixel pixel, size_t count)
+{
+	for(; count != 0; --count)
+	{
+		push_back(dataPair, pixel);
+	}
+}
+
+inline size_t index(Pixel pixel)
+{
+	return (pixel.red * 3U + pixel.green * 5U + pixel.blue * 7U + pixel.alpha * 11U) & 0b111111U;
+}
 } // namespace helpers
 
 using DataVector = std::vector<uint8_t>; // TODO make templates and remove direct vector dependency
@@ -124,10 +153,74 @@ Header readHeader(const DataVector& qoiData)
 
 DataPair<DataVector> decode(const DataVector& qoiData)
 {
+	if(qoiData.size() < constants::headerSize + constants::endMarkerSize + 1)
+	{
+		throw std::exception{"insufficient data"};
+	}
+
 	DataPair<DataVector> dataPair{readHeader(qoiData)};
 	dataPair.data.reserve(helpers::bufferSize(dataPair.header));
-	// decode
-	//
+
+	const auto qoiEnd = std::prev(cend(qoiData), constants::endMarkerSize);
+	auto qoiIt = std::next(cbegin(qoiData), constants::headerSize);
+
+	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
+	helpers::Pixel lastPixel{0, 0, 0, 255};
+
+	while(qoiIt != qoiEnd) // TODO handle corrupted data (chunks of wrong size)
+	{
+		if(qoiIt[0] == constants::tagRGB)
+		{
+			lastPixel = helpers::Pixel{qoiIt[1], qoiIt[2], qoiIt[3], lastPixel.alpha};
+			helpers::push_back(dataPair, lastPixel);
+			previousPixels[helpers::index(lastPixel)] = lastPixel;
+			advance(qoiIt, 4);
+			continue;
+		}
+		if(qoiIt[0] == constants::tagRGBA)
+		{
+			lastPixel = helpers::Pixel{qoiIt[1], qoiIt[2], qoiIt[3], qoiIt[4]};
+			helpers::push_back(dataPair, lastPixel);
+			previousPixels[helpers::index(lastPixel)] = lastPixel;
+			advance(qoiIt, 5);
+			continue;
+		}
+		switch(qoiIt[0] & constants::tagMask2)
+		{
+		case constants::tagIndex:
+			lastPixel = previousPixels[qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2)];
+			helpers::push_back(dataPair, lastPixel);
+			advance(qoiIt, 1);
+			break;
+		case constants::tagDiff:
+			lastPixel = helpers::Pixel{static_cast<uint8_t>(lastPixel.red + (((qoiIt[0] & 0b00110000U) >> 4U) - 2U)),
+			    static_cast<uint8_t>(lastPixel.green + (((qoiIt[0] & 0b00001100U) >> 2U) - 2U)),
+			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[0] & 0b00000011U) - 2U)), lastPixel.alpha};
+			helpers::push_back(dataPair, lastPixel);
+			previousPixels[helpers::index(lastPixel)] = lastPixel;
+			advance(qoiIt, 1);
+			break;
+		case constants::tagLuma:
+		{
+			const uint8_t greenDiff = qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2) - 32U;
+			lastPixel = helpers::Pixel{
+			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
+			    static_cast<uint8_t>(lastPixel.green + greenDiff),
+			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[1] & 0b00001111U) - 8U) + greenDiff), lastPixel.alpha};
+			helpers::push_back(dataPair, lastPixel);
+			previousPixels[helpers::index(lastPixel)] = lastPixel;
+			advance(qoiIt, 2);
+			break;
+		}
+		case constants::tagRun:
+			helpers::push_back(dataPair, lastPixel, (qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2)) + 1);
+			advance(qoiIt, 1);
+			break;
+		default:
+			throw std::exception{"unknown chunk"};
+		}
+	}
+
 	return dataPair;
 }
 

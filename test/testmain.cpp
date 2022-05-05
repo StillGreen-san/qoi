@@ -91,12 +91,12 @@ TEST_CASE("decode")
 	{
 		auto dataPair = decode(testData.qoi.kodim10);
 		CHECK(dataPair.header == testData.desc.kodim10);
-		CHECK(dataPair.data ==testData.raw.kodim10);
+		CHECK(dataPair.data == testData.raw.kodim10);
 	}
 	{
 		auto dataPair = decode(testData.qoi.dice);
 		CHECK(dataPair.header == testData.desc.dice);
-		CHECK(dataPair.data ==testData.raw.dice);
+		CHECK(dataPair.data == testData.raw.dice);
 	}
 	{
 		auto dataPair = decode(testData.qoi.testcardalpha);
