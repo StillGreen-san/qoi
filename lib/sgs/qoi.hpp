@@ -153,7 +153,7 @@ Header readHeader(const DataVector& qoiData)
 
 DataPair<DataVector> decode(const DataVector& qoiData)
 {
-	if(qoiData.size() < constants::headerSize + constants::endMarkerSize + 1)
+	if(qoiData.size() < constants::headerSize + constants::endMarkerSize)
 	{
 		throw std::exception{"insufficient data"};
 	}
@@ -188,7 +188,7 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 		switch(qoiIt[0] & constants::tagMask2)
 		{
 		case constants::tagIndex:
-			lastPixel = previousPixels[qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2)];
+			lastPixel = previousPixels[qoiIt[0]];
 			helpers::push_back(dataPair, lastPixel);
 			advance(qoiIt, 1);
 			break;
