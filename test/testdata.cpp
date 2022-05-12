@@ -19,7 +19,7 @@ void load(const std::filesystem::path& path, std::vector<uint8_t>& qoi, std::vec
 	const size_t fileSize = file_size(path);
 	qoi.resize(fileSize);
 
-	file.get(qoi.data(), static_cast<std::streamsize>(fileSize));
+	file.read(qoi.data(), static_cast<std::streamsize>(fileSize));
 
 	std::unique_ptr<impl::IImageData> decoded = impl::phoboslab::qoi::decode(qoi);
 	raw.assign(decoded->data(), decoded->data() + decoded->size());
