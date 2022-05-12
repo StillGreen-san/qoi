@@ -31,13 +31,14 @@ TEST_CASE("decode bench")
 	using namespace impl;
 	TestData testData;
 
+	QOI_BENCH_DECODE(stillgreensan::qoi::decode);
 	QOI_BENCH_DECODE(phoboslab::qoi::decode);
 	QOI_BENCH_DECODE(pfusik::qoici::c::decode);
 	QOI_BENCH_DECODE(pfusik::qoici::cpp::decode);
 	QOI_BENCH_DECODE(shadowmitia::libqoi::decode);
 //	QOI_BENCH_DECODE(shraiwi::miniqoi::c::decode);
 //	QOI_BENCH_DECODE(shraiwi::miniqoi::cpp::decode);
-	QOI_BENCH_DECODE(wx257osn2::qoixx::decode); // TODO insufficient input data
+	QOI_BENCH_DECODE(wx257osn2::qoixx::decode);
 }
 
 TEST_CASE("encode bench")

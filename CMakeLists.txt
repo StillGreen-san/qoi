@@ -102,6 +102,8 @@ target_compile_features( sgs_qoi INTERFACE cxx_std_17 )
 target_compile_definitions( sgs_qoi INTERFACE $<$<STREQUAL:${CMAKE_CXX_BYTE_ORDER},BIG_ENDIAN>:CMAKE_CXX_BIG_ENDIAN> )
 target_include_directories( sgs_qoi INTERFACE lib )
 
+AddLib( stillgreensan_qoi_impl test/stillgreensan_qoi.cpp sgs::qoi )
+
 AddLib( test_data test/testdata.cpp phoboslab_qoi_impl )
 
 add_executable( sgs_qoi_test test/testmain.cpp )
@@ -110,6 +112,7 @@ PostBuildImageCopy( sgs_qoi_test qoi_test_images )
 
 add_executable( bench test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
+	stillgreensan_qoi_impl
 #	shraiwi_miniqoi_c_impl
 #	shraiwi_miniqoi_cpp_impl
 	wx257osn2_qoixx_impl
