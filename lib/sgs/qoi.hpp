@@ -262,12 +262,12 @@ DataVector encode(const Header& header, const DataVector& rawData)
 
 	data.insert(end(data), std::cbegin(Header::magic), std::cend(Header::magic));
 
-	auto dataIt = end(data);
 	data.resize(data.size() + 4);
+	auto dataIt = prev(end(data), 4);
 	helpers::writeBE(dataIt, header.width);
 
-	dataIt = end(data);
 	data.resize(data.size() + 4);
+	dataIt = prev(end(data), 4);
 	helpers::writeBE(dataIt, header.height);
 
 	data.push_back(static_cast<uint8_t>(header.channels));
@@ -288,11 +288,13 @@ DataVector encode(const Header& header, const DataVector& rawData)
 		if(currentPixel == lastPixel)
 		{
 			uint8_t runCount = 1;
-			for(; runCount < constants::tagRunMaxLength;
+			for(;
+			    next(rawIt, static_cast<ptrdiff_t>(header.channels)) != rawEnd && runCount < constants::tagRunMaxLength;
 			    ++runCount, advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
 			{
-				const helpers::Pixel nextPixel{
-				    rawIt[4], rawIt[5], rawIt[6], header.channels == Channels::RGBA ? rawIt[7] : lastPixel.alpha};
+				auto rawNext = next(rawIt, static_cast<ptrdiff_t>(header.channels));
+				const helpers::Pixel nextPixel{rawNext[0], rawNext[1], rawNext[2],
+				    header.channels == Channels::RGBA ? rawNext[3] : lastPixel.alpha};
 				if(nextPixel != currentPixel)
 				{
 					break;

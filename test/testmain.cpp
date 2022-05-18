@@ -151,31 +151,31 @@ TEST_CASE("encode")
 	const TestData& testData = TestData::getInstance();
 
 	{
-		auto data = encode(toHeader(testData.desc.kodim10), testData.qoi.kodim10);
-		CHECK(data == testData.raw.kodim10);
+		auto data = encode(toHeader(testData.desc.kodim10), testData.raw.kodim10);
+		CHECK(data == testData.qoi.kodim10);
 	}
 	{
-		auto data = encode(toHeader(testData.desc.dice), testData.qoi.dice);
-		CHECK(data == testData.raw.dice);
+		auto data = encode(toHeader(testData.desc.dice), testData.raw.dice);
+		CHECK(data == testData.qoi.dice);
 	}
 	{
-		auto data = encode(toHeader(testData.desc.testcardalpha), testData.qoi.testcardalpha);
-		CHECK(data == testData.raw.testcardalpha);
+		auto data = encode(toHeader(testData.desc.testcardalpha), testData.raw.testcardalpha);
+		CHECK(data == testData.qoi.testcardalpha);
 	}
 	{
-		auto data = encode(toHeader(testData.desc.testcard), testData.qoi.testcard);
-		CHECK(data == testData.raw.testcard);
+		auto data = encode(toHeader(testData.desc.testcard), testData.raw.testcard);
+		CHECK(data == testData.qoi.testcard);
 	}
 	{
-		auto data = encode(toHeader(testData.desc.qoilogo), testData.qoi.qoilogo);
-		CHECK(data == testData.raw.qoilogo);
+		auto data = encode(toHeader(testData.desc.qoilogo), testData.raw.qoilogo);
+		CHECK(data == testData.qoi.qoilogo);
 	}
 	{
-		auto data = encode(toHeader(testData.desc.wikipedia), testData.qoi.wikipedia);
-		CHECK(data == testData.raw.wikipedia);
+		auto data = encode(toHeader(testData.desc.wikipedia), testData.raw.wikipedia);
+		CHECK(data == testData.qoi.wikipedia);
 	}
 	{
-		auto data = encode(toHeader(testData.desc.kodim23), testData.qoi.kodim23);
-		CHECK(data == testData.raw.kodim23);
+		auto data = encode(toHeader(testData.desc.kodim23), testData.raw.kodim23);
+		CHECK(data == testData.qoi.kodim23);
 	}
 }
