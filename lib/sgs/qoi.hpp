@@ -119,6 +119,14 @@ struct Pixel
 	uint8_t green;
 	uint8_t blue;
 	uint8_t alpha;
+	[[nodiscard]] inline bool operator==(const Pixel rhs) const
+	{
+		return red == rhs.red && green == rhs.green && blue == rhs.blue && alpha == rhs.alpha;
+	}
+	[[nodiscard]] inline bool operator!=(const Pixel rhs) const
+	{
+		return red != rhs.red || green != rhs.green || blue != rhs.blue || alpha != rhs.alpha;
+	}
 };
 
 template<typename TContainer>
@@ -247,16 +255,56 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 	return dataPair;
 }
 
-DataVector encode([[maybe_unused]] const Header& header, [[maybe_unused]] const DataVector& rawData)
+DataVector encode(const Header& header, const DataVector& rawData)
 {
 	DataVector data;
-	//	data.reserve(helpers::qoiBufferSizeMin(header));
+	data.reserve(helpers::qoiBufferSizeMin(header));
 
-	//	const auto rawEnd = cend(rawData);
-	//	auto rawIt = cbegin(rawData);
+	data.insert(end(data), std::cbegin(Header::magic), std::cend(Header::magic));
 
-	//	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
-	//	helpers::Pixel lastPixel{0, 0, 0, 255};
+	auto dataIt = end(data);
+	data.resize(data.size() + 4);
+	helpers::writeBE(dataIt, header.width);
+
+	dataIt = end(data);
+	data.resize(data.size() + 4);
+	helpers::writeBE(dataIt, header.height);
+
+	data.push_back(static_cast<uint8_t>(header.channels));
+	data.push_back(static_cast<uint8_t>(header.colorspace));
+
+	const auto rawEnd = cend(rawData);
+	auto rawIt = cbegin(rawData);
+
+	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
+	helpers::Pixel lastPixel{0, 0, 0, 255};
+
+	for(; rawIt != rawEnd; advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
+	{
+		const helpers::Pixel currentPixel{
+		    rawIt[0], rawIt[1], rawIt[2], header.channels == Channels::RGBA ? rawIt[3] : lastPixel.alpha};
+		const size_t prevIdx = helpers::index(currentPixel);
+
+		if(currentPixel == lastPixel)
+		{
+			uint8_t runCount = 1;
+			for(; runCount < constants::tagRunMaxLength; ++runCount, advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
+			{
+				const helpers::Pixel nextPixel{
+				    rawIt[4], rawIt[5], rawIt[6], header.channels == Channels::RGBA ? rawIt[7] : lastPixel.alpha};
+				if(nextPixel != currentPixel)
+				{
+					break;
+				}
+			}
+			data.push_back(
+			    constants::tagRun | static_cast<uint8_t>(static_cast<uint8_t>(~constants::tagMask2) & runCount));
+			continue;
+		}
+	}
+
+	data.insert(end(data), 7, 0);
+	data.insert(end(data), 1);
 
 	return data;
 }
