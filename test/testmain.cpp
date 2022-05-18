@@ -51,25 +51,41 @@ sgs::qoi::Header toHeader(const impl::ImageDescription& desc)
 
 #include <catch2/catch.hpp>
 
-TEST_CASE("helper")
+TEST_CASE("helpers")
 {
-	using sgs::qoi::helpers::pushByte;
+	SECTION("pushByte")
+	{
+		using sgs::qoi::helpers::pushByte;
 
-	uint32_t value = 0;
-	value = pushByte(value, 0x01);
-	REQUIRE(value == 0x01);
+		uint32_t value = 0;
+		value = pushByte(value, 0x01);
+		REQUIRE(value == 0x01);
 
-	value = pushByte(value, 0x10);
-	REQUIRE(value == 0x0110);
+		value = pushByte(value, 0x10);
+		REQUIRE(value == 0x0110);
 
-	value = pushByte(value, 0xff);
-	REQUIRE(value == 0x0110ff);
+		value = pushByte(value, 0xff);
+		REQUIRE(value == 0x0110ff);
+	}
 
-	using sgs::qoi::helpers::isLittleEndian;
-	using sgs::qoi::helpers::read32BE;
-	std::array<uint8_t, 4> bytes{0xAA, 0xBB, 0xCC, 0xDD};
+	SECTION("read32BE")
+	{
+		using sgs::qoi::helpers::read32BE;
+		std::array<uint8_t, 4> bytes{0xAA, 0xBB, 0xCC, 0xDD};
 
-	REQUIRE(read32BE(bytes.begin()) == 0xAABBCCDD);
+		REQUIRE(read32BE(bytes.begin()) == 0xAABBCCDD);
+	}
+
+	SECTION("writeBE")
+	{
+		using sgs::qoi::helpers::writeBE;
+		const std::array<uint8_t, 4> target{0xAA, 0xBB, 0xCC, 0xDD};
+		std::array<uint8_t, 4> bytes{0, 0, 0, 0};
+
+		writeBE(bytes.begin(), 0xAABBCCDD);
+
+		REQUIRE(bytes == target);
+	}
 }
 
 TEST_CASE("readHeader")

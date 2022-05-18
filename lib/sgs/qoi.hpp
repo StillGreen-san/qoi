@@ -87,6 +87,22 @@ inline uint32_t read32BE(TIterator it)
 	}
 }
 
+template<typename TIterator>
+inline void writeBE(TIterator it, uint32_t value)
+{
+	if constexpr(isLittleEndian)
+	{
+		it[0] = (value & 0xff000000U) >> 24U;
+		it[1] = (value & 0x00ff0000U) >> 16U;
+		it[2] = (value & 0x0000ff00U) >> 8U;
+		it[3] = (value & 0x000000ffU) >> 0U;
+	}
+	else
+	{
+		*reinterpret_cast<uint32_t*>(&*it) = value;
+	}
+}
+
 inline size_t rawBufferSize(const Header& header)
 {
 	return header.width * header.height * static_cast<size_t>(header.channels);
@@ -234,13 +250,13 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 DataVector encode([[maybe_unused]] const Header& header, [[maybe_unused]] const DataVector& rawData)
 {
 	DataVector data;
-//	data.reserve(helpers::qoiBufferSizeMin(header));
+	//	data.reserve(helpers::qoiBufferSizeMin(header));
 
-//	const auto rawEnd = cend(rawData);
-//	auto rawIt = cbegin(rawData);
+	//	const auto rawEnd = cend(rawData);
+	//	auto rawIt = cbegin(rawData);
 
-//	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
-//	helpers::Pixel lastPixel{0, 0, 0, 255};
+	//	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
+	//	helpers::Pixel lastPixel{0, 0, 0, 255};
 
 	return data;
 }
