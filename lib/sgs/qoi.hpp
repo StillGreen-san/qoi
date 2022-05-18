@@ -288,7 +288,8 @@ DataVector encode(const Header& header, const DataVector& rawData)
 		if(currentPixel == lastPixel)
 		{
 			uint8_t runCount = 1;
-			for(; runCount < constants::tagRunMaxLength; ++runCount, advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
+			for(; runCount < constants::tagRunMaxLength;
+			    ++runCount, advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
 			{
 				const helpers::Pixel nextPixel{
 				    rawIt[4], rawIt[5], rawIt[6], header.channels == Channels::RGBA ? rawIt[7] : lastPixel.alpha};
@@ -301,6 +302,50 @@ DataVector encode(const Header& header, const DataVector& rawData)
 			    constants::tagRun | static_cast<uint8_t>(static_cast<uint8_t>(~constants::tagMask2) & runCount));
 			continue;
 		}
+
+		if(previousPixels[prevIdx] == currentPixel)
+		{
+			lastPixel = currentPixel;
+			data.push_back(
+			    constants::tagIndex | static_cast<uint8_t>(static_cast<size_t>(~constants::tagMask2) & prevIdx));
+			continue;
+		}
+
+		if(lastPixel.alpha != currentPixel.alpha)
+		{
+			lastPixel = currentPixel;
+			data.push_back(constants::tagRGBA);
+			data.push_back(currentPixel.red);
+			data.push_back(currentPixel.green);
+			data.push_back(currentPixel.blue);
+			data.push_back(currentPixel.alpha);
+			continue;
+		}
+
+		const uint8_t diffGreen = currentPixel.green - lastPixel.green;
+		const uint8_t diffRed = currentPixel.red - lastPixel.red;
+		const uint8_t diffBlue = currentPixel.blue - lastPixel.blue;
+		const uint8_t diffRedLuma = diffRed - diffGreen;
+		const uint8_t diffBlueLuma = diffBlue - diffGreen;
+
+		if(diffGreen > 63 || diffRedLuma > 15 || diffBlueLuma > 15)
+		{
+			lastPixel = currentPixel;
+			data.push_back(constants::tagRGB);
+			data.push_back(currentPixel.red);
+			data.push_back(currentPixel.green);
+			data.push_back(currentPixel.blue);
+			continue;
+		}
+
+		if(diffGreen < 4 && diffRedLuma < 4 && diffBlueLuma < 4)
+		{
+			data.push_back(constants::tagDiff | (diffRed + 2U) << 4U | (diffGreen + 2U) << 2U | (diffBlue + 2U));
+			continue;
+		}
+
+		data.push_back(constants::tagLuma | diffGreen + 32U);
+		data.push_back((diffRedLuma + 8U) << 4U | (diffBlueLuma + 8U));
 	}
 
 	data.insert(end(data), 7, 0);
