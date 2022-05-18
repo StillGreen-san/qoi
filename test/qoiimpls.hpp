@@ -42,7 +42,7 @@ inline uint8_t colorspace(bool linear)
 namespace stillgreensan::qoi
 {
 std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-//std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc);
+std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc);
 } // namespace stillgreensan::qoi
 
 namespace pfusik::qoici

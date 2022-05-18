@@ -43,6 +43,12 @@ std::ostream& operator<<(std::ostream& oStrm, const std::vector<uint8_t>& value)
 	return oStrm;
 }
 
+sgs::qoi::Header toHeader(const impl::ImageDescription& desc)
+{
+	return {desc.width, desc.height, static_cast<sgs::qoi::Channels>(desc.channels),
+	    static_cast<sgs::qoi::Colorspace>(desc.colorspace)};
+}
+
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
@@ -84,7 +90,6 @@ TEST_CASE("readHeader")
 
 TEST_CASE("decode")
 {
-	using Catch::Matchers::Equals;
 	using sgs::qoi::decode;
 	TestData testData;
 
@@ -122,5 +127,40 @@ TEST_CASE("decode")
 		auto dataPair = decode(testData.qoi.kodim23);
 		CHECK(dataPair.header == testData.desc.kodim23);
 		CHECK(dataPair.data == testData.raw.kodim23);
+	}
+}
+
+TEST_CASE("encode")
+{
+	using sgs::qoi::encode;
+	TestData testData;
+
+	{
+		auto data = encode(toHeader(testData.desc.kodim10), testData.qoi.kodim10);
+		CHECK(data == testData.raw.kodim10);
+	}
+	{
+		auto data = encode(toHeader(testData.desc.dice), testData.qoi.dice);
+		CHECK(data == testData.raw.dice);
+	}
+	{
+		auto data = encode(toHeader(testData.desc.testcardalpha), testData.qoi.testcardalpha);
+		CHECK(data == testData.raw.testcardalpha);
+	}
+	{
+		auto data = encode(toHeader(testData.desc.testcard), testData.qoi.testcard);
+		CHECK(data == testData.raw.testcard);
+	}
+	{
+		auto data = encode(toHeader(testData.desc.qoilogo), testData.qoi.qoilogo);
+		CHECK(data == testData.raw.qoilogo);
+	}
+	{
+		auto data = encode(toHeader(testData.desc.wikipedia), testData.qoi.wikipedia);
+		CHECK(data == testData.raw.wikipedia);
+	}
+	{
+		auto data = encode(toHeader(testData.desc.kodim23), testData.qoi.kodim23);
+		CHECK(data == testData.raw.kodim23);
 	}
 }

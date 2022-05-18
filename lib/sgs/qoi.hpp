@@ -224,6 +224,22 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 	return dataPair;
 }
 
+DataVector encode([[maybe_unused]] const Header& header, [[maybe_unused]] const DataVector& rawData)
+{
+	DataVector data;
+//	data.reserve(helpers::bufferSize(header));
+
+//	const auto rawEnd = cend(rawData);
+//	auto rawIt = cbegin(rawData);
+
+//	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
+//	helpers::Pixel lastPixel{0, 0, 0, 255};
+
+
+
+	return data;
+}
+
 // Header readHeader(const TData& qoiData);
 // TDataPair<TData> decode(const TData& qoiData);
 // DataPair<TContainer> decode(const TData& qoiData);
