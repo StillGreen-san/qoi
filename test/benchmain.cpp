@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <catch2/catch.hpp>
 
@@ -29,7 +28,7 @@ BENCHMARK_ADVANCED(#FUNCTION)(Catch::Benchmark::Chronometer meter) {\
 TEST_CASE("decode bench")
 {
 	using namespace impl;
-	TestData testData;
+	const TestData& testData = TestData::getInstance();
 
 	QOI_BENCH_DECODE(stillgreensan::qoi::decode);
 	QOI_BENCH_DECODE(phoboslab::qoi::decode);
@@ -44,7 +43,7 @@ TEST_CASE("decode bench")
 TEST_CASE("encode bench")
 {
 	using namespace impl;
-	TestData testData;
+	const TestData& testData = TestData::getInstance();
 
 	QOI_BENCH_ENCODE(phoboslab::qoi::encode);
 //	QOI_BENCH_ENCODE(pfusik::qoici::c::encode); // TODO assumes rgba fails on rgb

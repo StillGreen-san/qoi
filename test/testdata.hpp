@@ -4,7 +4,10 @@
 
 struct TestData
 {
+private:
 	TestData();
+public:
+	static const TestData& getInstance();
 	struct
 	{
 		std::vector<uint8_t> dice;

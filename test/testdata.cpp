@@ -40,3 +40,9 @@ TestData::TestData()
 	load("testcard_rgba.qoi", qoi.testcardalpha, raw.testcardalpha, desc.testcardalpha);
 	load("wikipedia_008.qoi", qoi.wikipedia, raw.wikipedia, desc.wikipedia);
 }
+
+const TestData& TestData::getInstance()
+{
+	static TestData testData;
+	return testData;
+}

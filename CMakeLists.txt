@@ -106,11 +106,11 @@ AddLib( stillgreensan_qoi_impl test/stillgreensan_qoi.cpp sgs::qoi )
 
 AddLib( test_data test/testdata.cpp phoboslab_qoi_impl )
 
-add_executable( sgs_qoi_test test/testmain.cpp )
+add_executable( sgs_qoi_test test/catchmain.cpp test/testmain.cpp )
 target_link_libraries( sgs_qoi_test PRIVATE sgs::qoi test_data Catch2::Catch2)
 PostBuildImageCopy( sgs_qoi_test qoi_test_images )
 
-add_executable( bench test/benchmain.cpp )
+add_executable( bench test/catchmain.cpp test/benchmain.cpp )
 target_link_libraries( bench PRIVATE
 	stillgreensan_qoi_impl
 #	shraiwi_miniqoi_c_impl

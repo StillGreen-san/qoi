@@ -49,7 +49,6 @@ sgs::qoi::Header toHeader(const impl::ImageDescription& desc)
 	    static_cast<sgs::qoi::Colorspace>(desc.colorspace)};
 }
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 TEST_CASE("helper")
@@ -77,7 +76,7 @@ TEST_CASE("readHeader")
 {
 	using sgs::qoi::Header;
 	using sgs::qoi::readHeader;
-	TestData testData;
+	const TestData& testData = TestData::getInstance();
 
 	CHECK(readHeader(testData.qoi.wikipedia) == testData.desc.wikipedia);
 	CHECK(readHeader(testData.qoi.testcardalpha) == testData.desc.testcardalpha);
@@ -91,7 +90,7 @@ TEST_CASE("readHeader")
 TEST_CASE("decode")
 {
 	using sgs::qoi::decode;
-	TestData testData;
+	const TestData& testData = TestData::getInstance();
 
 	{
 		auto dataPair = decode(testData.qoi.kodim10);
@@ -133,7 +132,7 @@ TEST_CASE("decode")
 TEST_CASE("encode")
 {
 	using sgs::qoi::encode;
-	TestData testData;
+	const TestData& testData = TestData::getInstance();
 
 	{
 		auto data = encode(toHeader(testData.desc.kodim10), testData.qoi.kodim10);
