@@ -26,6 +26,7 @@ constexpr uint8_t tagIndex = 0b00000000;
 constexpr uint8_t tagDiff = 0b01000000;
 constexpr uint8_t tagLuma = 0b10000000;
 constexpr uint8_t tagRun = 0b11000000;
+constexpr size_t tagRunMaxLength = 62;
 } // namespace constants
 
 enum class Channels : uint8_t
@@ -86,9 +87,14 @@ inline uint32_t read32BE(TIterator it)
 	}
 }
 
-inline size_t bufferSize(const Header& header)
+inline size_t rawBufferSize(const Header& header)
 {
 	return header.width * header.height * static_cast<size_t>(header.channels);
+}
+inline size_t qoiBufferSizeMin(const Header& header)
+{
+	return constants::headerSize + constants::endMarkerSize +
+	       ((header.width * header.height * static_cast<size_t>(header.channels)) / constants::tagRunMaxLength);
 }
 
 struct Pixel
@@ -159,7 +165,7 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 	}
 
 	DataPair<DataVector> dataPair{readHeader(qoiData)};
-	dataPair.data.reserve(helpers::bufferSize(dataPair.header));
+	dataPair.data.reserve(helpers::rawBufferSize(dataPair.header));
 
 	const auto qoiEnd = std::prev(cend(qoiData), constants::endMarkerSize);
 	auto qoiIt = std::next(cbegin(qoiData), constants::headerSize);
@@ -167,7 +173,8 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
 	helpers::Pixel lastPixel{0, 0, 0, 255};
 
-	for(size_t target = dataPair.data.capacity(); qoiIt != qoiEnd && dataPair.data.size() < target;) // TODO handle corrupted data (chunks of wrong size)
+	// TODO handle corrupted data (chunks of wrong size)
+	for(size_t target = dataPair.data.capacity(); qoiIt != qoiEnd && dataPair.data.size() < target;)
 	{
 		if(qoiIt[0] == constants::tagRGB)
 		{
@@ -227,15 +234,13 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 DataVector encode([[maybe_unused]] const Header& header, [[maybe_unused]] const DataVector& rawData)
 {
 	DataVector data;
-//	data.reserve(helpers::bufferSize(header));
+//	data.reserve(helpers::qoiBufferSizeMin(header));
 
 //	const auto rawEnd = cend(rawData);
 //	auto rawIt = cbegin(rawData);
 
 //	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
 //	helpers::Pixel lastPixel{0, 0, 0, 255};
-
-
 
 	return data;
 }
