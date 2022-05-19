@@ -39,6 +39,13 @@ TestData::TestData()
 	load("testcard.qoi", qoi.testcard, raw.testcard, desc.testcard);
 	load("testcard_rgba.qoi", qoi.testcardalpha, raw.testcardalpha, desc.testcardalpha);
 	load("wikipedia_008.qoi", qoi.wikipedia, raw.wikipedia, desc.wikipedia);
+
+	load("diff.qoi", qoi.diff, raw.diff, desc.diff);
+	load("luma.qoi", qoi.luma, raw.luma, desc.luma);
+	load("rgb.qoi", qoi.rgb, raw.rgb, desc.rgb);
+	load("rgba.qoi", qoi.rgba, raw.rgba, desc.rgba);
+	load("rgbidx.qoi", qoi.rgbidx, raw.rgbidx, desc.rgbidx);
+	load("run.qoi", qoi.run, raw.run, desc.run);
 }
 
 const TestData& TestData::getInstance()

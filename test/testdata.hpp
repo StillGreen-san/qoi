@@ -17,6 +17,13 @@ public:
 		std::vector<uint8_t> testcard;
 		std::vector<uint8_t> testcardalpha;
 		std::vector<uint8_t> wikipedia;
+
+		std::vector<uint8_t> diff;
+		std::vector<uint8_t> luma;
+		std::vector<uint8_t> rgb;
+		std::vector<uint8_t> rgba;
+		std::vector<uint8_t> rgbidx;
+		std::vector<uint8_t> run;
 	} qoi, raw;
 	struct
 	{
@@ -27,5 +34,12 @@ public:
 		impl::ImageDescription testcard;
 		impl::ImageDescription testcardalpha;
 		impl::ImageDescription wikipedia;
+
+		impl::ImageDescription diff;
+		impl::ImageDescription luma;
+		impl::ImageDescription rgb;
+		impl::ImageDescription rgba;
+		impl::ImageDescription rgbidx;
+		impl::ImageDescription run;
 	} desc;
 };

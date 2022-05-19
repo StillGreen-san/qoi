@@ -56,6 +56,25 @@ macro( PostBuildImageCopy #[[LibTarget ImageTarget]])
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/testcard_rgba.qoi"
 			$<TARGET_FILE_DIR:${ARGV0}>
+
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/diff.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/luma.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rgb.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rgba.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rgbidx.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/run.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
 	)
 endmacro()
 
