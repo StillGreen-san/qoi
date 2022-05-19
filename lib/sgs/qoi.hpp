@@ -334,7 +334,8 @@ DataVector encode(const Header& header, const DataVector& rawData)
 		lastPixel = currentPixel;
 		previousPixels[helpers::index(lastPixel)] = lastPixel;
 
-		if(diffGreen > 63 || diffRedLuma > 15 || diffBlueLuma > 15)
+		if(static_cast<uint8_t>(diffGreen + 32U) > 63 || static_cast<uint8_t>(diffRedLuma + 8U) > 15 ||
+		    static_cast<uint8_t>(diffBlueLuma + 8U) > 15)
 		{
 			data.push_back(constants::tagRGB);
 			data.push_back(currentPixel.red);
@@ -343,14 +344,16 @@ DataVector encode(const Header& header, const DataVector& rawData)
 			continue;
 		}
 
-		if(diffGreen < 4 && diffRedLuma < 4 && diffBlueLuma < 4)
+		if(static_cast<uint8_t>(diffGreen + 2U) < 4 && static_cast<uint8_t>(diffRed + 2U) < 4 &&
+		    static_cast<uint8_t>(diffBlue + 2U) < 4)
 		{
-			data.push_back(constants::tagDiff | (diffRed + 2U) << 4U | (diffGreen + 2U) << 2U | (diffBlue + 2U));
+			data.push_back(constants::tagDiff | static_cast<uint8_t>(diffRed + 2U) << 4U |
+			               static_cast<uint8_t>(diffGreen + 2U) << 2U | static_cast<uint8_t>(diffBlue + 2U));
 			continue;
 		}
 
-		data.push_back(constants::tagLuma | diffGreen + 32U);
-		data.push_back((diffRedLuma + 8U) << 4U | (diffBlueLuma + 8U));
+		data.push_back(constants::tagLuma | static_cast<uint8_t>(diffGreen + 32U));
+		data.push_back((diffRedLuma + 8U) << 4U | static_cast<uint8_t>(diffBlueLuma + 8U));
 	}
 
 	data.insert(end(data), 7, 0);
