@@ -283,7 +283,6 @@ DataVector encode(const Header& header, const DataVector& rawData)
 	{
 		const helpers::Pixel currentPixel{
 		    rawIt[0], rawIt[1], rawIt[2], header.channels == Channels::RGBA ? rawIt[3] : lastPixel.alpha};
-		const size_t prevIdx = helpers::index(currentPixel);
 
 		if(currentPixel == lastPixel)
 		{
@@ -305,9 +304,11 @@ DataVector encode(const Header& header, const DataVector& rawData)
 			continue;
 		}
 
+		const size_t prevIdx = helpers::index(lastPixel);
 		if(previousPixels[prevIdx] == currentPixel)
 		{
 			lastPixel = currentPixel;
+			previousPixels[helpers::index(lastPixel)] = lastPixel;
 			data.push_back(
 			    constants::tagIndex | static_cast<uint8_t>(static_cast<size_t>(~constants::tagMask2) & prevIdx));
 			continue;
@@ -316,6 +317,7 @@ DataVector encode(const Header& header, const DataVector& rawData)
 		if(lastPixel.alpha != currentPixel.alpha)
 		{
 			lastPixel = currentPixel;
+			previousPixels[helpers::index(lastPixel)] = lastPixel;
 			data.push_back(constants::tagRGBA);
 			data.push_back(currentPixel.red);
 			data.push_back(currentPixel.green);
@@ -330,9 +332,11 @@ DataVector encode(const Header& header, const DataVector& rawData)
 		const uint8_t diffRedLuma = diffRed - diffGreen;
 		const uint8_t diffBlueLuma = diffBlue - diffGreen;
 
+		lastPixel = currentPixel;
+		previousPixels[helpers::index(lastPixel)] = lastPixel;
+
 		if(diffGreen > 63 || diffRedLuma > 15 || diffBlueLuma > 15)
 		{
-			lastPixel = currentPixel;
 			data.push_back(constants::tagRGB);
 			data.push_back(currentPixel.red);
 			data.push_back(currentPixel.green);
