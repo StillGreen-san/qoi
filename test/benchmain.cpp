@@ -4,6 +4,8 @@
 #include "testdata.hpp"
 #include "qoiimpls.hpp"
 
+// TODO add bench for simple tests?
+
 #define QOI_BENCH_DECODE(FUNCTION) \
 BENCHMARK_ADVANCED(#FUNCTION)(Catch::Benchmark::Chronometer meter) {\
 	meter.measure([&] { return FUNCTION(testData.qoi.dice); });\

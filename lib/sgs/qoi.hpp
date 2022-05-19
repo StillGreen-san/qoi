@@ -301,7 +301,7 @@ DataVector encode(const Header& header, const DataVector& rawData)
 				}
 			}
 			data.push_back(
-			    constants::tagRun | static_cast<uint8_t>(static_cast<uint8_t>(~constants::tagMask2) & runCount));
+			    constants::tagRun | static_cast<uint8_t>(static_cast<uint8_t>(~constants::tagMask2) & (runCount - 1U)));
 			continue;
 		}
 
