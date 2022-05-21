@@ -130,57 +130,67 @@ TEST_CASE("decode")
 			CHECK(dataPair.header == testData.desc.diff);
 			CHECK(dataPair.data == testData.raw.diff);
 		}
-        {
-	        auto dataPair = decode(testData.qoi.luma);
-	        CHECK(dataPair.header == testData.desc.luma);
-	        CHECK(dataPair.data == testData.raw.luma);
-        }
-        {
-	        auto dataPair = decode(testData.qoi.rgbidx);
-	        CHECK(dataPair.header == testData.desc.rgbidx);
-	        CHECK(dataPair.data == testData.raw.rgbidx);
-        }
+		{
+			auto dataPair = decode(testData.qoi.luma);
+			CHECK(dataPair.header == testData.desc.luma);
+			CHECK(dataPair.data == testData.raw.luma);
+		}
+		{
+			auto dataPair = decode(testData.qoi.rgbidx);
+			CHECK(dataPair.header == testData.desc.rgbidx);
+			CHECK(dataPair.data == testData.raw.rgbidx);
+		}
+		{
+			auto dataPair = decode(testData.qoi.rng01);
+			CHECK(dataPair.header == testData.desc.rng01);
+			CHECK(dataPair.data == testData.raw.rng01);
+		}
+		{
+			auto dataPair = decode(testData.qoi.rng02);
+			CHECK(dataPair.header == testData.desc.rng02);
+			CHECK(dataPair.data == testData.raw.rng02);
+		}
 	}
 
 	SECTION("advanced")
-    {
-	    {
-		    auto dataPair = decode(testData.qoi.kodim10);
-		    CHECK(dataPair.header == testData.desc.kodim10);
-		    CHECK(dataPair.data == testData.raw.kodim10);
-	    }
-	    {
-		    auto dataPair = decode(testData.qoi.dice);
-		    CHECK(dataPair.header == testData.desc.dice);
-		    CHECK(dataPair.data == testData.raw.dice);
-	    }
-	    {
-		    auto dataPair = decode(testData.qoi.testcardalpha);
-		    CHECK(dataPair.header == testData.desc.testcardalpha);
-		    CHECK(dataPair.data == testData.raw.testcardalpha);
-	    }
-	    {
-		    auto dataPair = decode(testData.qoi.testcard);
-		    CHECK(dataPair.header == testData.desc.testcard);
-		    CHECK(dataPair.data == testData.raw.testcard);
-	    }
-	    {
-		    auto dataPair = decode(testData.qoi.qoilogo);
-		    CHECK(dataPair.header == testData.desc.qoilogo);
-		    CHECK(dataPair.data == testData.raw.qoilogo);
-	    }
-	    {
-		    auto dataPair = decode(testData.qoi.wikipedia);
-		    CHECK(dataPair.header == testData.desc.wikipedia);
-		    CHECK(dataPair.data == testData.raw.wikipedia);
-	    }
-	    {
-		    auto dataPair = decode(testData.qoi.kodim23);
-		    CHECK(dataPair.header == testData.desc.kodim23);
-		    CHECK(dataPair.data == testData.raw.kodim23);
-	    }
-    }
-    }
+	{
+		{
+			auto dataPair = decode(testData.qoi.kodim10);
+			CHECK(dataPair.header == testData.desc.kodim10);
+			CHECK(dataPair.data == testData.raw.kodim10);
+		}
+		{
+			auto dataPair = decode(testData.qoi.dice);
+			CHECK(dataPair.header == testData.desc.dice);
+			CHECK(dataPair.data == testData.raw.dice);
+		}
+		{
+			auto dataPair = decode(testData.qoi.testcardalpha);
+			CHECK(dataPair.header == testData.desc.testcardalpha);
+			CHECK(dataPair.data == testData.raw.testcardalpha);
+		}
+		{
+			auto dataPair = decode(testData.qoi.testcard);
+			CHECK(dataPair.header == testData.desc.testcard);
+			CHECK(dataPair.data == testData.raw.testcard);
+		}
+		{
+			auto dataPair = decode(testData.qoi.qoilogo);
+			CHECK(dataPair.header == testData.desc.qoilogo);
+			CHECK(dataPair.data == testData.raw.qoilogo);
+		}
+		{
+			auto dataPair = decode(testData.qoi.wikipedia);
+			CHECK(dataPair.header == testData.desc.wikipedia);
+			CHECK(dataPair.data == testData.raw.wikipedia);
+		}
+		{
+			auto dataPair = decode(testData.qoi.kodim23);
+			CHECK(dataPair.header == testData.desc.kodim23);
+			CHECK(dataPair.data == testData.raw.kodim23);
+		}
+	}
+}
 
 TEST_CASE("encode")
 {
@@ -212,6 +222,14 @@ TEST_CASE("encode")
 		{
 			auto data = encode(toHeader(testData.desc.rgbidx), testData.raw.rgbidx);
 			CHECK(data == testData.qoi.rgbidx);
+		}
+		{
+			auto data = encode(toHeader(testData.desc.rng01), testData.raw.rng01);
+			CHECK(data == testData.qoi.rng01);
+		}
+		{
+			auto data = encode(toHeader(testData.desc.rng02), testData.raw.rng02);
+			CHECK(data == testData.qoi.rng02);
 		}
 	}
 

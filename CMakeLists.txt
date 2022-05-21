@@ -32,7 +32,7 @@ macro( AddLib #[[LibName LibSource LinkLibName]])
 	target_link_libraries( ${ARGV0} PRIVATE ${ARGV2} )
 	target_compile_features( ${ARGV0} PUBLIC cxx_std_17 )
 endmacro()
-macro( PostBuildImageCopy #[[LibTarget ImageTarget]])
+macro( PostBuildImageCopy #[[LibTarget ImageTarget]]) # TODO use wildcards?!
 	add_custom_command(
 		TARGET ${ARGV0} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -74,6 +74,12 @@ macro( PostBuildImageCopy #[[LibTarget ImageTarget]])
 			$<TARGET_FILE_DIR:${ARGV0}>
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/run.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rng01.qoi"
+			$<TARGET_FILE_DIR:${ARGV0}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rng02.qoi"
 			$<TARGET_FILE_DIR:${ARGV0}>
 	)
 endmacro()

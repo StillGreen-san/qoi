@@ -24,6 +24,8 @@ public:
 		std::vector<uint8_t> rgba;
 		std::vector<uint8_t> rgbidx;
 		std::vector<uint8_t> run;
+		std::vector<uint8_t> rng01;
+		std::vector<uint8_t> rng02;
 	} qoi, raw;
 	struct
 	{
@@ -41,5 +43,7 @@ public:
 		impl::ImageDescription rgba;
 		impl::ImageDescription rgbidx;
 		impl::ImageDescription run;
+		impl::ImageDescription rng01;
+		impl::ImageDescription rng02;
 	} desc;
 };

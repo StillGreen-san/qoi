@@ -46,6 +46,8 @@ TestData::TestData()
 	load("rgba.qoi", qoi.rgba, raw.rgba, desc.rgba);
 	load("rgbidx.qoi", qoi.rgbidx, raw.rgbidx, desc.rgbidx);
 	load("run.qoi", qoi.run, raw.run, desc.run);
+	load("rng01.qoi", qoi.rng01, raw.rng01, desc.rng01);
+	load("rng02.qoi", qoi.rng02, raw.rng02, desc.rng02);
 }
 
 const TestData& TestData::getInstance()
