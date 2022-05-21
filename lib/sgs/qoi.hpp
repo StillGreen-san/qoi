@@ -304,12 +304,11 @@ DataVector encode(const Header& header, const DataVector& rawData)
 			continue;
 		}
 
-		if(auto pixIt = std::find(cbegin(previousPixels), cend(previousPixels), currentPixel);
-		    pixIt != cend(previousPixels))
+		const size_t idx = helpers::index(currentPixel);
+		if(previousPixels[idx] == currentPixel)
 		{
 			lastPixel = currentPixel;
-			data.push_back(constants::tagIndex |
-			               static_cast<uint8_t>(static_cast<size_t>(~constants::tagMask2) & helpers::index(lastPixel)));
+			data.push_back(constants::tagIndex | static_cast<uint8_t>(static_cast<size_t>(~constants::tagMask2) & idx));
 			continue;
 		}
 
