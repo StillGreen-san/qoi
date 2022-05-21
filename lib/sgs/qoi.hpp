@@ -9,7 +9,6 @@
 #include <vector>
 
 // TODO constrain templates
-// TODO optimizations for continues storage
 
 namespace sgs::qoi
 {
@@ -41,7 +40,7 @@ enum class Colorspace : uint8_t
 };
 struct Header
 {
-	static constexpr uint8_t magic[constants::magicBytes]{'q', 'o', 'i', 'f'};
+	static constexpr std::array<uint8_t, constants::magicBytes> magic{'q', 'o', 'i', 'f'};
 	uint32_t width{0};
 	uint32_t height{0};
 	Channels channels{Channels::RGBA};
@@ -70,47 +69,48 @@ inline TResult pushByte(TResult value, TInt byte)
 }
 
 template<typename TIterator>
-inline uint32_t read32BE(TIterator it)
+inline uint32_t read32BE(TIterator itr)
 {
 	if constexpr(isLittleEndian)
 	{
 		uint32_t value = 0;
-		value = pushByte(value, *it++);
-		value = pushByte(value, *it++);
-		value = pushByte(value, *it++);
-		value = pushByte(value, *it);
+		value = pushByte(value, *itr++);
+		value = pushByte(value, *itr++);
+		value = pushByte(value, *itr++);
+		value = pushByte(value, *itr);
 		return value;
 	}
 	else
-	{
-		return *reinterpret_cast<const uint32_t*>(&*it);
+	{                                                     // TODO assumes contiguous storage
+		return *reinterpret_cast<const uint32_t*>(&*itr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	}
 }
 
 template<typename TIterator>
-inline void writeBE(TIterator it, uint32_t value)
+inline void writeBE(TIterator itr, uint32_t value)
 {
 	if constexpr(isLittleEndian)
 	{
-		it[0] = (value & 0xff000000U) >> 24U;
-		it[1] = (value & 0x00ff0000U) >> 16U;
-		it[2] = (value & 0x0000ff00U) >> 8U;
-		it[3] = (value & 0x000000ffU) >> 0U;
+		itr[0] = (value & 0xff000000U) >> 24U;
+		itr[1] = (value & 0x00ff0000U) >> 16U;
+		itr[2] = (value & 0x0000ff00U) >> 8U;
+		itr[3] = (value & 0x000000ffU) >> 0U;
 	}
 	else
-	{
-		*reinterpret_cast<uint32_t*>(&*it) = value;
+	{                                                // TODO assumes contiguous storage
+		*reinterpret_cast<uint32_t*>(&*itr) = value; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	}
 }
 
 inline size_t rawBufferSize(const Header& header)
 {
-	return header.width * header.height * static_cast<size_t>(header.channels);
+	return static_cast<size_t>(header.width) * header.height * static_cast<size_t>(header.channels);
 }
 inline size_t qoiBufferSizeMin(const Header& header)
 {
 	return constants::headerSize + constants::endMarkerSize +
-	       ((header.width * header.height * static_cast<size_t>(header.channels)) / constants::tagRunMaxLength);
+	       ((static_cast<size_t>(header.width) * header.height * static_cast<size_t>(header.channels)) /
+	           constants::tagRunMaxLength);
 }
 
 struct Pixel
@@ -132,7 +132,13 @@ struct Pixel
 template<typename TContainer>
 inline void push_back(DataPair<TContainer>& dataPair, Pixel pixel)
 {
-	dataPair.data.insert(end(dataPair.data), &pixel.red, &pixel.red + static_cast<size_t>(dataPair.header.channels));
+	dataPair.data.push_back(pixel.red);
+	dataPair.data.push_back(pixel.green);
+	dataPair.data.push_back(pixel.blue);
+	if(dataPair.header.channels == Channels::RGBA)
+	{
+		dataPair.data.push_back(pixel.alpha);
+	}
 }
 template<typename TContainer>
 inline void push_back(DataPair<TContainer>& dataPair, Pixel pixel, size_t count)
@@ -346,8 +352,8 @@ DataVector encode(const Header& header, const DataVector& rawData)
 		if(static_cast<uint8_t>(diffGreen + 2U) < 4 && static_cast<uint8_t>(diffRed + 2U) < 4 &&
 		    static_cast<uint8_t>(diffBlue + 2U) < 4)
 		{
-			data.push_back(constants::tagDiff | static_cast<uint8_t>(diffRed + 2U) << 4U |
-			               static_cast<uint8_t>(diffGreen + 2U) << 2U | static_cast<uint8_t>(diffBlue + 2U));
+			data.push_back(constants::tagDiff |
+			               static_cast<uint8_t>((diffRed + 2U) << 4U | (diffGreen + 2U) << 2U | (diffBlue + 2U)));
 			continue;
 		}
 
