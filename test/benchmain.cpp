@@ -47,6 +47,7 @@ TEST_CASE("encode bench")
 	using namespace impl;
 	const TestData& testData = TestData::getInstance();
 
+	QOI_BENCH_ENCODE(stillgreensan::qoi::encode);
 	QOI_BENCH_ENCODE(phoboslab::qoi::encode);
 //	QOI_BENCH_ENCODE(pfusik::qoici::c::encode); // TODO assumes rgba fails on rgb
 //	QOI_BENCH_ENCODE(pfusik::qoici::cpp::encode);
