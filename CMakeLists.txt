@@ -32,53 +32,26 @@ macro( AddLib #[[LibName LibSource LinkLibName]])
 	target_link_libraries( ${ARGV0} PRIVATE ${ARGV2} )
 	target_compile_features( ${ARGV0} PUBLIC cxx_std_17 )
 endmacro()
-macro( PostBuildImageCopy #[[LibTarget ImageTarget]]) # TODO use wildcards?!
+macro( PostBuildImageCopy #[[LibTarget ImageTarget]])
 	add_custom_command(
 		TARGET ${ARGV0} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/wikipedia_008.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/dice.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/kodim10.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/kodim23.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/qoi_logo.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/testcard.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${${ARGV1}_SOURCE_DIR}/testcard_rgba.qoi"
 			$<TARGET_FILE_DIR:${ARGV0}>
-
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/diff.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/luma.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rgb.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rgba.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rgbidx.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/run.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rng01.qoi"
-			$<TARGET_FILE_DIR:${ARGV0}>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${CMAKE_CURRENT_SOURCE_DIR}/test/qoi/rng02.qoi"
 			$<TARGET_FILE_DIR:${ARGV0}>
 	)
