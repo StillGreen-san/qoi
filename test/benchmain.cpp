@@ -8,23 +8,23 @@
 
 #define QOI_BENCH_DECODE(FUNCTION) \
 BENCHMARK_ADVANCED(#FUNCTION)(Catch::Benchmark::Chronometer meter) {\
-	meter.measure([&] { return FUNCTION(testData.qoi.dice); });\
-	meter.measure([&] { return FUNCTION(testData.qoi.kodim23); });\
-	meter.measure([&] { return FUNCTION(testData.qoi.kodim10); });\
-	meter.measure([&] { return FUNCTION(testData.qoi.qoilogo); });\
-	meter.measure([&] { return FUNCTION(testData.qoi.testcard); });\
-	meter.measure([&] { return FUNCTION(testData.qoi.testcardalpha); });\
-	meter.measure([&] { return FUNCTION(testData.qoi.wikipedia); });\
+	meter.measure([&] { return FUNCTION(testData.dice.qoi); });\
+	meter.measure([&] { return FUNCTION(testData.kodim23.qoi); });\
+	meter.measure([&] { return FUNCTION(testData.kodim10.qoi); });\
+	meter.measure([&] { return FUNCTION(testData.qoilogo.qoi); });\
+	meter.measure([&] { return FUNCTION(testData.testcard.qoi); });\
+	meter.measure([&] { return FUNCTION(testData.testcardalpha.qoi); });\
+	meter.measure([&] { return FUNCTION(testData.wikipedia.qoi); });\
 	}
 #define QOI_BENCH_ENCODE(FUNCTION) \
 BENCHMARK_ADVANCED(#FUNCTION)(Catch::Benchmark::Chronometer meter) {\
-	meter.measure([&] { return FUNCTION(testData.raw.dice, testData.desc.dice); });\
-	meter.measure([&] { return FUNCTION(testData.raw.kodim23, testData.desc.kodim23); });\
-	meter.measure([&] { return FUNCTION(testData.raw.kodim10, testData.desc.kodim10); });\
-	meter.measure([&] { return FUNCTION(testData.raw.qoilogo, testData.desc.qoilogo); });\
-	meter.measure([&] { return FUNCTION(testData.raw.testcard, testData.desc.testcard); });\
-	meter.measure([&] { return FUNCTION(testData.raw.testcardalpha, testData.desc.testcardalpha); });\
-	meter.measure([&] { return FUNCTION(testData.raw.wikipedia, testData.desc.wikipedia); });\
+	meter.measure([&] { return FUNCTION(testData.dice.raw, testData.dice.desc); });\
+	meter.measure([&] { return FUNCTION(testData.kodim23.raw, testData.kodim23.desc); });\
+	meter.measure([&] { return FUNCTION(testData.kodim10.raw, testData.kodim10.desc); });\
+	meter.measure([&] { return FUNCTION(testData.qoilogo.raw, testData.qoilogo.desc); });\
+	meter.measure([&] { return FUNCTION(testData.testcard.raw, testData.testcard.desc); });\
+	meter.measure([&] { return FUNCTION(testData.testcardalpha.raw, testData.testcardalpha.desc); });\
+	meter.measure([&] { return FUNCTION(testData.wikipedia.raw, testData.wikipedia.desc); });\
 	}
 
 TEST_CASE("decode bench")

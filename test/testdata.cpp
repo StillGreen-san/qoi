@@ -7,7 +7,7 @@
 
 namespace
 {
-void load(const std::filesystem::path& path, std::vector<uint8_t>& qoi, std::vector<uint8_t>& raw, impl::ImageDescription& desc)
+void load(const std::filesystem::path& path, TestData::Triplet& data)
 {
 	if(!std::filesystem::exists(path))
 	{
@@ -17,37 +17,38 @@ void load(const std::filesystem::path& path, std::vector<uint8_t>& qoi, std::vec
 	std::basic_ifstream<uint8_t> file(path, std::ios_base::in | std::ios_base::binary);
 
 	const size_t fileSize = file_size(path);
-	qoi.resize(fileSize);
+	data.qoi.resize(fileSize);
 
-	file.read(qoi.data(), static_cast<std::streamsize>(fileSize));
+	file.read(data.qoi.data(), static_cast<std::streamsize>(fileSize));
 
-	std::unique_ptr<impl::IImageData> decoded = impl::phoboslab::qoi::decode(qoi);
-	raw.assign(decoded->data(), decoded->data() + decoded->size());
-	desc.width = decoded->width();
-	desc.height = decoded->height();
-	desc.channels = decoded->channels();
-	desc.colorspace = decoded->colorspace();
+	std::unique_ptr<impl::IImageData> decoded = impl::phoboslab::qoi::decode(data.qoi);
+	data.raw.assign(decoded->data(),
+	    decoded->data() + decoded->size()); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+	data.desc.width = decoded->width();
+	data.desc.height = decoded->height();
+	data.desc.channels = decoded->channels();
+	data.desc.colorspace = decoded->colorspace();
 }
 } // namespace
 
 TestData::TestData()
 {
-	load("dice.qoi", qoi.dice, raw.dice, desc.dice);
-	load("kodim10.qoi", qoi.kodim10, raw.kodim10, desc.kodim10);
-	load("kodim23.qoi", qoi.kodim23, raw.kodim23, desc.kodim23);
-	load("qoi_logo.qoi", qoi.qoilogo, raw.qoilogo, desc.qoilogo);
-	load("testcard.qoi", qoi.testcard, raw.testcard, desc.testcard);
-	load("testcard_rgba.qoi", qoi.testcardalpha, raw.testcardalpha, desc.testcardalpha);
-	load("wikipedia_008.qoi", qoi.wikipedia, raw.wikipedia, desc.wikipedia);
+	load("dice.qoi", dice);
+	load("kodim10.qoi", kodim10);
+	load("kodim23.qoi", kodim23);
+	load("qoi_logo.qoi", qoilogo);
+	load("testcard.qoi", testcard);
+	load("testcard_rgba.qoi", testcardalpha);
+	load("wikipedia_008.qoi", wikipedia);
 
-	load("diff.qoi", qoi.diff, raw.diff, desc.diff);
-	load("luma.qoi", qoi.luma, raw.luma, desc.luma);
-	load("rgb.qoi", qoi.rgb, raw.rgb, desc.rgb);
-	load("rgba.qoi", qoi.rgba, raw.rgba, desc.rgba);
-	load("rgbidx.qoi", qoi.rgbidx, raw.rgbidx, desc.rgbidx);
-	load("run.qoi", qoi.run, raw.run, desc.run);
-	load("rng01.qoi", qoi.rng01, raw.rng01, desc.rng01);
-	load("rng02.qoi", qoi.rng02, raw.rng02, desc.rng02);
+	load("diff.qoi", diff);
+	load("luma.qoi", luma);
+	load("rgb.qoi", rgb);
+	load("rgba.qoi", rgba);
+	load("rgbidx.qoi", rgbidx);
+	load("run.qoi", run);
+	load("rng01.qoi", rng01);
+	load("rng02.qoi", rng02);
 }
 
 const TestData& TestData::getInstance()

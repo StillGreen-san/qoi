@@ -94,13 +94,13 @@ TEST_CASE("readHeader")
 	using sgs::qoi::readHeader;
 	const TestData& testData = TestData::getInstance();
 
-	CHECK(readHeader(testData.qoi.wikipedia) == testData.desc.wikipedia);
-	CHECK(readHeader(testData.qoi.testcardalpha) == testData.desc.testcardalpha);
-	CHECK(readHeader(testData.qoi.testcard) == testData.desc.testcard);
-	CHECK(readHeader(testData.qoi.qoilogo) == testData.desc.qoilogo);
-	CHECK(readHeader(testData.qoi.kodim23) == testData.desc.kodim23);
-	CHECK(readHeader(testData.qoi.kodim10) == testData.desc.kodim10);
-	CHECK(readHeader(testData.qoi.dice) == testData.desc.dice);
+	CHECK(readHeader(testData.wikipedia.qoi) == testData.wikipedia.desc);
+	CHECK(readHeader(testData.testcardalpha.qoi) == testData.testcardalpha.desc);
+	CHECK(readHeader(testData.testcard.qoi) == testData.testcard.desc);
+	CHECK(readHeader(testData.qoilogo.qoi) == testData.qoilogo.desc);
+	CHECK(readHeader(testData.kodim23.qoi) == testData.kodim23.desc);
+	CHECK(readHeader(testData.kodim10.qoi) == testData.kodim10.desc);
+	CHECK(readHeader(testData.dice.qoi) == testData.dice.desc);
 }
 
 TEST_CASE("decode")
@@ -111,83 +111,83 @@ TEST_CASE("decode")
 	SECTION("simple")
 	{
 		{
-			auto dataPair = decode(testData.qoi.rgb);
-			CHECK(dataPair.header == testData.desc.rgb);
-			CHECK(dataPair.data == testData.raw.rgb);
+			auto dataPair = decode(testData.rgb.qoi);
+			CHECK(dataPair.header == testData.rgb.desc);
+			CHECK(dataPair.data == testData.rgb.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.rgba);
-			CHECK(dataPair.header == testData.desc.rgba);
-			CHECK(dataPair.data == testData.raw.rgba);
+			auto dataPair = decode(testData.rgba.qoi);
+			CHECK(dataPair.header == testData.rgba.desc);
+			CHECK(dataPair.data == testData.rgba.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.run);
-			CHECK(dataPair.header == testData.desc.run);
-			CHECK(dataPair.data == testData.raw.run);
+			auto dataPair = decode(testData.run.qoi);
+			CHECK(dataPair.header == testData.run.desc);
+			CHECK(dataPair.data == testData.run.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.diff);
-			CHECK(dataPair.header == testData.desc.diff);
-			CHECK(dataPair.data == testData.raw.diff);
+			auto dataPair = decode(testData.diff.qoi);
+			CHECK(dataPair.header == testData.diff.desc);
+			CHECK(dataPair.data == testData.diff.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.luma);
-			CHECK(dataPair.header == testData.desc.luma);
-			CHECK(dataPair.data == testData.raw.luma);
+			auto dataPair = decode(testData.luma.qoi);
+			CHECK(dataPair.header == testData.luma.desc);
+			CHECK(dataPair.data == testData.luma.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.rgbidx);
-			CHECK(dataPair.header == testData.desc.rgbidx);
-			CHECK(dataPair.data == testData.raw.rgbidx);
+			auto dataPair = decode(testData.rgbidx.qoi);
+			CHECK(dataPair.header == testData.rgbidx.desc);
+			CHECK(dataPair.data == testData.rgbidx.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.rng01);
-			CHECK(dataPair.header == testData.desc.rng01);
-			CHECK(dataPair.data == testData.raw.rng01);
+			auto dataPair = decode(testData.rng01.qoi);
+			CHECK(dataPair.header == testData.rng01.desc);
+			CHECK(dataPair.data == testData.rng01.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.rng02);
-			CHECK(dataPair.header == testData.desc.rng02);
-			CHECK(dataPair.data == testData.raw.rng02);
+			auto dataPair = decode(testData.rng02.qoi);
+			CHECK(dataPair.header == testData.rng02.desc);
+			CHECK(dataPair.data == testData.rng02.raw);
 		}
 	}
 
 	SECTION("advanced")
 	{
 		{
-			auto dataPair = decode(testData.qoi.kodim10);
-			CHECK(dataPair.header == testData.desc.kodim10);
-			CHECK(dataPair.data == testData.raw.kodim10);
+			auto dataPair = decode(testData.kodim10.qoi);
+			CHECK(dataPair.header == testData.kodim10.desc);
+			CHECK(dataPair.data == testData.kodim10.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.dice);
-			CHECK(dataPair.header == testData.desc.dice);
-			CHECK(dataPair.data == testData.raw.dice);
+			auto dataPair = decode(testData.dice.qoi);
+			CHECK(dataPair.header == testData.dice.desc);
+			CHECK(dataPair.data == testData.dice.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.testcardalpha);
-			CHECK(dataPair.header == testData.desc.testcardalpha);
-			CHECK(dataPair.data == testData.raw.testcardalpha);
+			auto dataPair = decode(testData.testcardalpha.qoi);
+			CHECK(dataPair.header == testData.testcardalpha.desc);
+			CHECK(dataPair.data == testData.testcardalpha.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.testcard);
-			CHECK(dataPair.header == testData.desc.testcard);
-			CHECK(dataPair.data == testData.raw.testcard);
+			auto dataPair = decode(testData.testcard.qoi);
+			CHECK(dataPair.header == testData.testcard.desc);
+			CHECK(dataPair.data == testData.testcard.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.qoilogo);
-			CHECK(dataPair.header == testData.desc.qoilogo);
-			CHECK(dataPair.data == testData.raw.qoilogo);
+			auto dataPair = decode(testData.qoilogo.qoi);
+			CHECK(dataPair.header == testData.qoilogo.desc);
+			CHECK(dataPair.data == testData.qoilogo.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.wikipedia);
-			CHECK(dataPair.header == testData.desc.wikipedia);
-			CHECK(dataPair.data == testData.raw.wikipedia);
+			auto dataPair = decode(testData.wikipedia.qoi);
+			CHECK(dataPair.header == testData.wikipedia.desc);
+			CHECK(dataPair.data == testData.wikipedia.raw);
 		}
 		{
-			auto dataPair = decode(testData.qoi.kodim23);
-			CHECK(dataPair.header == testData.desc.kodim23);
-			CHECK(dataPair.data == testData.raw.kodim23);
+			auto dataPair = decode(testData.kodim23.qoi);
+			CHECK(dataPair.header == testData.kodim23.desc);
+			CHECK(dataPair.data == testData.kodim23.raw);
 		}
 	}
 }
@@ -200,68 +200,68 @@ TEST_CASE("encode")
 	SECTION("simple")
 	{
 		{
-			auto data = encode(toHeader(testData.desc.rgb), testData.raw.rgb);
-			CHECK(data == testData.qoi.rgb);
+			auto data = encode(toHeader(testData.rgb.desc), testData.rgb.raw);
+			CHECK(data == testData.rgb.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.rgba), testData.raw.rgba);
-			CHECK(data == testData.qoi.rgba);
+			auto data = encode(toHeader(testData.rgba.desc), testData.rgba.raw);
+			CHECK(data == testData.rgba.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.run), testData.raw.run);
-			CHECK(data == testData.qoi.run);
+			auto data = encode(toHeader(testData.run.desc), testData.run.raw);
+			CHECK(data == testData.run.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.diff), testData.raw.diff);
-			CHECK(data == testData.qoi.diff);
+			auto data = encode(toHeader(testData.diff.desc), testData.diff.raw);
+			CHECK(data == testData.diff.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.luma), testData.raw.luma);
-			CHECK(data == testData.qoi.luma);
+			auto data = encode(toHeader(testData.luma.desc), testData.luma.raw);
+			CHECK(data == testData.luma.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.rgbidx), testData.raw.rgbidx);
-			CHECK(data == testData.qoi.rgbidx);
+			auto data = encode(toHeader(testData.rgbidx.desc), testData.rgbidx.raw);
+			CHECK(data == testData.rgbidx.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.rng01), testData.raw.rng01);
-			CHECK(data == testData.qoi.rng01);
+			auto data = encode(toHeader(testData.rng01.desc), testData.rng01.raw);
+			CHECK(data == testData.rng01.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.rng02), testData.raw.rng02);
-			CHECK(data == testData.qoi.rng02);
+			auto data = encode(toHeader(testData.rng02.desc), testData.rng02.raw);
+			CHECK(data == testData.rng02.qoi);
 		}
 	}
 
 	SECTION("advanced")
 	{
 		{
-			auto data = encode(toHeader(testData.desc.kodim10), testData.raw.kodim10);
-			CHECK(data == testData.qoi.kodim10);
+			auto data = encode(toHeader(testData.kodim10.desc), testData.kodim10.raw);
+			CHECK(data == testData.kodim10.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.dice), testData.raw.dice);
-			CHECK(data == testData.qoi.dice);
+			auto data = encode(toHeader(testData.dice.desc), testData.dice.raw);
+			CHECK(data == testData.dice.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.testcardalpha), testData.raw.testcardalpha);
-			CHECK(data == testData.qoi.testcardalpha);
+			auto data = encode(toHeader(testData.testcardalpha.desc), testData.testcardalpha.raw);
+			CHECK(data == testData.testcardalpha.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.testcard), testData.raw.testcard);
-			CHECK(data == testData.qoi.testcard);
+			auto data = encode(toHeader(testData.testcard.desc), testData.testcard.raw);
+			CHECK(data == testData.testcard.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.qoilogo), testData.raw.qoilogo);
-			CHECK(data == testData.qoi.qoilogo);
+			auto data = encode(toHeader(testData.qoilogo.desc), testData.qoilogo.raw);
+			CHECK(data == testData.qoilogo.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.wikipedia), testData.raw.wikipedia);
-			CHECK(data == testData.qoi.wikipedia);
+			auto data = encode(toHeader(testData.wikipedia.desc), testData.wikipedia.raw);
+			CHECK(data == testData.wikipedia.qoi);
 		}
 		{
-			auto data = encode(toHeader(testData.desc.kodim23), testData.raw.kodim23);
-			CHECK(data == testData.qoi.kodim23);
+			auto data = encode(toHeader(testData.kodim23.desc), testData.kodim23.raw);
+			CHECK(data == testData.kodim23.qoi);
 		}
 	}
 }
