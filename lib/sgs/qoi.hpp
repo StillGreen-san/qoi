@@ -55,12 +55,6 @@ struct DataPair
 
 namespace helpers
 {
-#ifdef CMAKE_CXX_BIG_ENDIAN
-constexpr bool isLittleEndian = false;
-#else
-constexpr bool isLittleEndian = true;
-#endif
-
 template<typename TResult, typename TInt>
 inline TResult pushByte(TResult value, TInt byte)
 {
@@ -71,35 +65,21 @@ inline TResult pushByte(TResult value, TInt byte)
 template<typename TIterator>
 inline uint32_t read32BE(TIterator itr)
 {
-	if constexpr(isLittleEndian)
-	{
-		uint32_t value = 0;
-		value = pushByte(value, *itr++);
-		value = pushByte(value, *itr++);
-		value = pushByte(value, *itr++);
-		value = pushByte(value, *itr);
-		return value;
-	}
-	else
-	{                                                     // TODO assumes contiguous storage
-		return *reinterpret_cast<const uint32_t*>(&*itr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-	}
+	uint32_t value = 0;
+	value = pushByte(value, *itr++);
+	value = pushByte(value, *itr++);
+	value = pushByte(value, *itr++);
+	value = pushByte(value, *itr);
+	return value;
 }
 
 template<typename TIterator>
 inline void writeBE(TIterator itr, uint32_t value)
 {
-	if constexpr(isLittleEndian)
-	{
-		itr[0] = (value & 0xff000000U) >> 24U;
-		itr[1] = (value & 0x00ff0000U) >> 16U;
-		itr[2] = (value & 0x0000ff00U) >> 8U;
-		itr[3] = (value & 0x000000ffU) >> 0U;
-	}
-	else
-	{                                                // TODO assumes contiguous storage
-		*reinterpret_cast<uint32_t*>(&*itr) = value; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-	}
+	*itr++ = static_cast<uint8_t>((value & 0xff000000U) >> 24U);
+	*itr++ = static_cast<uint8_t>((value & 0x00ff0000U) >> 16U);
+	*itr++ = static_cast<uint8_t>((value & 0x0000ff00U) >> 8U);
+	*itr = static_cast<uint8_t>((value & 0x000000ffU));
 }
 
 inline size_t rawBufferSize(const Header& header)
