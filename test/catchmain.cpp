@@ -6,9 +6,20 @@
 
 int main(int argc, char* argv[])
 {
-	TestData::getInstance(); // load testdata
+	try
+	{
+		TestData::getInstance(); // load testdata
 
-	int result = Catch::Session().run(argc, argv);
+		int result = Catch::Session().run(argc, argv);
 
-	return result;
+		return result;
+	}
+	catch(const std::exception& exception)
+	{
+		std::cout << "Unhandled Exception: " << exception.what() << std::endl;
+	}
+	catch(...)
+	{
+		std::cout << "Unhandled Exception: UNKNOWN" << std::endl;
+	}
 }
