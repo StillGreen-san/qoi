@@ -95,3 +95,20 @@ TEST_CASE("encode full", "[full][encode]")
 	//	QOI_BENCH_ENCODE_FULL(shraiwi::miniqoi::cpp::encode, testData);
 	QOI_BENCH_ENCODE_FULL(wx257osn2::qoixx::encode, testData);
 }
+
+TEST_CASE("sgs quick", "[.][sgs]")
+{
+	using namespace impl;
+	const TestData& testData = TestData::getInstance();
+
+	QOI_BENCH_DECODE_QUICK(stillgreensan::qoi::decode, testData);
+	QOI_BENCH_ENCODE_QUICK(stillgreensan::qoi::encode, testData);
+}
+TEST_CASE("sgs full", "[.][sgs]")
+{
+	using namespace impl;
+	const TestData& testData = TestData::getInstance();
+
+	QOI_BENCH_DECODE_FULL(stillgreensan::qoi::decode, testData);
+	QOI_BENCH_ENCODE_FULL(stillgreensan::qoi::encode, testData);
+}
