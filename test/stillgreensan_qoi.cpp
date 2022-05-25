@@ -40,7 +40,7 @@ struct Decoder : public IImageData
 	{
 		return static_cast<uint8_t>(dataPair.header.colorspace);
 	}
-	sgs::qoi::DataPair<sgs::qoi::DataVector> dataPair;
+	sgs::qoi::DataPair<std::vector<uint8_t>> dataPair;
 };
 struct Encoder : public IImageData
 {
@@ -74,7 +74,7 @@ struct Encoder : public IImageData
 		return static_cast<uint8_t>(header.colorspace);
 	}
 	sgs::qoi::Header header;
-	sgs::qoi::DataVector dataVec;
+	std::vector<uint8_t> dataVec;
 };
 
 std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi)

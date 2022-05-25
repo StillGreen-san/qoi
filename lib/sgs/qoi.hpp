@@ -9,6 +9,8 @@
 #include <vector>
 
 // TODO constrain templates
+// TODO improve container support
+// TODO add noexcept where possible
 
 namespace sgs::qoi
 {
@@ -135,9 +137,8 @@ inline size_t index(Pixel pixel)
 }
 } // namespace helpers
 
-using DataVector = std::vector<uint8_t>; // TODO make templates and remove direct vector dependency
-
-Header readHeader(const DataVector& qoiData)
+template<typename TContainer>
+Header readHeader(const TContainer& qoiData)
 {
 	if(qoiData.size() < constants::headerSize)
 	{
@@ -167,14 +168,15 @@ Header readHeader(const DataVector& qoiData)
 	return header;
 }
 
-DataPair<DataVector> decode(const DataVector& qoiData)
+template<typename TOutContainer, typename TInContainer>
+DataPair<TOutContainer> decode(const TInContainer& qoiData)
 {
 	if(qoiData.size() < constants::headerSize + constants::endMarkerSize)
 	{
 		throw std::exception{"insufficient data"};
 	}
 
-	DataPair<DataVector> dataPair{readHeader(qoiData)};
+	DataPair<TOutContainer> dataPair{readHeader(qoiData)};
 	dataPair.data.reserve(helpers::rawBufferSize(dataPair.header));
 
 	const auto qoiEnd = std::prev(cend(qoiData), constants::endMarkerSize);
@@ -240,10 +242,16 @@ DataPair<DataVector> decode(const DataVector& qoiData)
 
 	return dataPair;
 }
-
-DataVector encode(const Header& header, const DataVector& rawData)
+template<typename TContainer>
+inline DataPair<TContainer> decode(const TContainer& qoiData)
 {
-	DataVector data;
+	return decode<TContainer, TContainer>(qoiData);
+}
+
+template<typename TOutContainer, typename TInContainer>
+TOutContainer encode(const Header& header, const TInContainer& rawData)
+{
+	TOutContainer data;
 	data.reserve(helpers::qoiBufferSizeMin(header));
 
 	data.insert(end(data), std::cbegin(Header::magic), std::cend(Header::magic));
@@ -346,13 +354,9 @@ DataVector encode(const Header& header, const DataVector& rawData)
 
 	return data;
 }
-
-// Header readHeader(const TData& qoiData);
-// TDataPair<TData> decode(const TData& qoiData);
-// DataPair<TContainer> decode(const TData& qoiData);
-// Header decode(const TData& qoiData, TData& rawData);
-// TData encode(const TDataPair<TData>& rawData);
-// TData encode(const Header& header, const TData& rawData);
-// TContainer encode(const DataPair<TData>& rawData);
-// TContainer encode(const Header& header, const TData& rawData);
+template<typename TContainer>
+inline TContainer encode(const Header& header, const TContainer& rawData)
+{
+	return encode<TContainer, TContainer>(header, rawData);
+}
 } // namespace sgs::qoi

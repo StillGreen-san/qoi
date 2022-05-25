@@ -2,6 +2,7 @@
 #include "testdata.hpp"
 
 #include <array>
+#include <deque>
 #include <ostream>
 
 bool operator==(const sgs::qoi::Header& sgsHeader, const impl::ImageDescription& testHeader) noexcept
@@ -190,6 +191,16 @@ TEST_CASE("decode")
 			CHECK(dataPair.data == testData.kodim23.raw);
 		}
 	}
+
+	SECTION("template")
+	{
+		{
+			std::deque<uint8_t> container(testData.rng01.qoi.begin(), testData.rng01.qoi.end());
+			auto dataPair = decode<std::vector<uint8_t>>(container);
+			CHECK(dataPair.header == testData.rng01.desc);
+			CHECK(dataPair.data == testData.rng01.raw);
+		}
+	}
 }
 
 TEST_CASE("encode")
@@ -262,6 +273,15 @@ TEST_CASE("encode")
 		{
 			auto data = encode(toHeader(testData.kodim23.desc), testData.kodim23.raw);
 			CHECK(data == testData.kodim23.qoi);
+		}
+	}
+
+	SECTION("template")
+	{
+		{
+			std::deque<uint8_t> container(testData.rng01.raw.begin(), testData.rng01.raw.end());
+			auto data = encode<std::vector<uint8_t>>(toHeader(testData.rng01.desc), container);
+			CHECK(data == testData.rng01.qoi);
 		}
 	}
 }
