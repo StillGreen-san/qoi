@@ -29,11 +29,11 @@ namespace std
 template<>
 struct hash<std::vector<uint8_t>>
 {
-	typedef std::vector<uint8_t> argument_type;
-	typedef std::size_t result_type;
-	result_type operator()(argument_type const& s) const noexcept
+	using argument_type = std::vector<uint8_t>;
+	using result_type = std::size_t;
+	result_type operator()(argument_type const& data) const noexcept
 	{
-		return std::hash<std::string_view>{}(std::string_view{reinterpret_cast<const char*>(s.data()), s.size()});
+		return std::hash<std::string_view>{}(std::string_view{reinterpret_cast<const char*>(data.data()), data.size()});
 	}
 };
 } // namespace std

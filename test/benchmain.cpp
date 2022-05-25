@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <catch2/catch.hpp>
 
-#include "testdata.hpp"
 #include "qoiimpls.hpp"
+#include "testdata.hpp"
 
 #define QOI_BENCH_DECODE_FULL(FUNCTION) \
 BENCHMARK_ADVANCED(#FUNCTION)(Catch::Benchmark::Chronometer meter) {\

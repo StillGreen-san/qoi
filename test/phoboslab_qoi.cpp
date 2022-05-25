@@ -7,7 +7,8 @@ namespace impl::phoboslab::qoi
 struct Decoder : public IImageData
 {
 	Decoder() = delete;
-	Decoder(const std::vector<uint8_t>& qoi) : pixels{::qoi_decode(qoi.data(), qoi.size(), &description, 0)}
+	explicit Decoder(const std::vector<uint8_t>& qoi) :
+	    pixels{::qoi_decode(qoi.data(), static_cast<int>(qoi.size()), &description, 0)}
 	{
 	}
 	const uint8_t* data() override
@@ -16,7 +17,7 @@ struct Decoder : public IImageData
 	}
 	size_t size() override
 	{
-		return width() * height() * channels();
+		return static_cast<size_t>(width()) * height() * channels();
 	}
 	uint32_t width() override
 	{
@@ -36,20 +37,17 @@ struct Decoder : public IImageData
 	}
 	~Decoder() override
 	{
-		free(pixels);
+		free(pixels); // NOLINT(cppcoreguidelines-owning-memory,cppcoreguidelines-no-malloc,hicpp-no-malloc)
 	}
-	::qoi_desc description;
+	::qoi_desc description{};
 	void* pixels;
 };
 struct Encoder : public IImageData
 {
 	Encoder() = delete;
-	Encoder(const std::vector<uint8_t>& raw, ImageDescription desc)
+	Encoder(const std::vector<uint8_t>& raw, ImageDescription desc) :
+	    description{desc.width,desc.height,desc.channels,desc.colorspace}
 	{
-		description.width = desc.width;
-		description.height = desc.height;
-		description.channels = desc.channels;
-		description.colorspace = desc.colorspace;
 		pixels = ::qoi_encode(raw.data(), &description, &length);
 	}
 	const uint8_t* data() override
@@ -78,7 +76,7 @@ struct Encoder : public IImageData
 	}
 	::qoi_desc description;
 	void* pixels;
-	int length;
+	int length{};
 };
 
 std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi)

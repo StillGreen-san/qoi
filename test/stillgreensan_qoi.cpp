@@ -13,7 +13,7 @@ sgs::qoi::Header toHeader(const ImageDescription& desc)
 struct Decoder : public IImageData
 {
 	Decoder() = delete;
-	Decoder(const std::vector<uint8_t>& qoi) : dataPair{sgs::qoi::decode(qoi)}
+	explicit Decoder(const std::vector<uint8_t>& qoi) : dataPair{sgs::qoi::decode(qoi)}
 	{
 	}
 	const uint8_t* data() override

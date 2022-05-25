@@ -7,7 +7,7 @@ namespace impl::shadowmitia::libqoi
 struct Decoder : public IImageData
 {
 	Decoder() = delete;
-	Decoder(const std::vector<uint8_t>& qoi) : pixels{qoi::decode(qoi)}, header{qoi::get_header(qoi)}
+	explicit Decoder(const std::vector<uint8_t>& qoi) : pixels{qoi::decode(qoi)}, header{qoi::get_header(qoi)}
 	{
 	}
 	const uint8_t* data() override

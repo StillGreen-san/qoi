@@ -7,7 +7,7 @@ namespace impl::wx257osn2::qoixx
 struct Decoder : public IImageData
 {
 	Decoder() = delete;
-	Decoder(const std::vector<uint8_t>& qoi) : pixels{::qoixx::qoi::decode<std::vector<uint8_t>>(qoi)}
+	explicit Decoder(const std::vector<uint8_t>& qoi) : pixels{::qoixx::qoi::decode<std::vector<uint8_t>>(qoi)}
 	{
 	}
 	const uint8_t* data() override
@@ -39,11 +39,10 @@ struct Decoder : public IImageData
 struct Encoder : public IImageData
 {
 	Encoder() = delete;
-	Encoder(const std::vector<uint8_t>& raw, ImageDescription description) : header{description}
+	Encoder(const std::vector<uint8_t>& raw, ImageDescription description) : desc{description.width, description.height, description.channels,
+	        static_cast<::qoixx::qoi::colorspace>(description.channels)},
+	    pixels{::qoixx::qoi::encode<std::vector<std::uint8_t>>(raw, desc)}
 	{
-		::qoixx::qoi::desc desc{description.width, description.height, description.channels,
-		    static_cast<::qoixx::qoi::colorspace>(description.channels)};
-		pixels = ::qoixx::qoi::encode<std::vector<std::uint8_t>>(raw, desc);
 	}
 	const uint8_t* data() override
 	{
@@ -55,22 +54,22 @@ struct Encoder : public IImageData
 	}
 	uint32_t width() override
 	{
-		return header.width;
+		return desc.width;
 	}
 	uint32_t height() override
 	{
-		return header.height;
+		return desc.height;
 	}
 	uint8_t channels() override
 	{
-		return header.channels;
+		return desc.channels;
 	}
 	uint8_t colorspace() override
 	{
-		return header.colorspace;
+		return static_cast<uint8_t>(desc.colorspace);
 	}
+	::qoixx::qoi::desc desc;
 	std::vector<uint8_t> pixels;
-	ImageDescription header;
 };
 
 std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi)

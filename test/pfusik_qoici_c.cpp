@@ -7,9 +7,9 @@ namespace impl::pfusik::qoici::c
 struct Decoder : public IImageData
 {
 	Decoder() = delete;
-	Decoder(const std::vector<uint8_t>& qoi) : decoder{::QOIDecoder_New()}
+	explicit Decoder(const std::vector<uint8_t>& qoi) : decoder{::QOIDecoder_New()}
 	{
-		QOIDecoder_Decode(decoder, qoi.data(), qoi.size());
+		QOIDecoder_Decode(decoder, qoi.data(), static_cast<int>(qoi.size()));
 	}
 	const uint8_t* data() override
 	{
@@ -17,7 +17,7 @@ struct Decoder : public IImageData
 	}
 	size_t size() override
 	{
-		return width() * height() * channels();
+		return static_cast<size_t>(width()) * height() * channels();
 	}
 	uint32_t width() override
 	{
@@ -47,7 +47,7 @@ struct Encoder : public IImageData
 	Encoder(const std::vector<uint8_t>& raw, ImageDescription description) :
 	    encoder{::QOIEncoder_New()}, description{description}
 	{
-		QOIEncoder_Encode(encoder, description.width, description.height, reinterpret_cast<const int*>(raw.data()),
+		QOIEncoder_Encode(encoder, static_cast<int>(description.width), static_cast<int>(description.height), reinterpret_cast<const int*>(raw.data()),
 		    alpha(description.channels), linear(description.colorspace));
 	}
 	const uint8_t* data() override
