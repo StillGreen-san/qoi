@@ -8,7 +8,8 @@
 Param(
     [Parameter(Mandatory)]
 	[string]$BenchmarkExecutable,
-	[string[]]$TagsToRun
+	[ValidateSet('SGS', 'Quick', 'Full', 'Encode', 'Decode')]
+	[string[]]$BenchmarkTags
 )
 
 if (!(Test-Path -Path $BenchmarkExecutable)) {
@@ -23,4 +24,16 @@ if (!(Split-Path -Path $BenchmarkExecutable -IsAbsolute)) {
 [string]$ExecutablePath = Split-Path -Path $BenchmarkExecutable
 [string]$ExecutableFile = Split-Path -Path $BenchmarkExecutable -Leaf
 
+for ($i = $BenchmarkTags.Count - 1; $i -ge 0 ; $i--) {
+	if (!$BenchmarkTags[$i].StartsWith('[') -or !$BenchmarkTags[$i].EndsWith(']')) {
+		$Tag = $BenchmarkTags[$i]
+		$BenchmarkTags[$i] = "[$Tag]"
+	}
+}
 
+[string]$CurrentLocation = Get-Location
+Set-Location -Path $ExecutablePath
+$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags | Out-String
+Set-Location -Path $CurrentLocation
+
+Write-Host -Object $BenchmarkResult
