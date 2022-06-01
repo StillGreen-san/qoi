@@ -3,11 +3,14 @@
 # benches /gU (-{70,}\n\N*\n-{70,}\X*\n\n\n)+
 # benchname /gU -{70,}\n(\N*)\n-{70,}
 # benchstats /gU \n(\N+)  *(\d+)  *(\d+)  *([\d\.]+ [mns]+)\n +([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)\n +([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)\n
- #>
+#>
 
 Param(
-    [Parameter(Mandatory)]
+	[Parameter(Mandatory)]
 	[string]$BenchmarkExecutable,
+	[Parameter(Mandatory)]
+	[int]$RunCount,
+	[Parameter(Mandatory)]
 	[ValidateSet('SGS', 'Quick', 'Full', 'Encode', 'Decode')]
 	[string[]]$BenchmarkTags
 )
@@ -31,9 +34,45 @@ for ($i = $BenchmarkTags.Count - 1; $i -ge 0 ; $i--) {
 	}
 }
 
+$BenchmarkObjects = @{}
 [string]$CurrentLocation = Get-Location
-Set-Location -Path $ExecutablePath
-$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags | Out-String
-Set-Location -Path $CurrentLocation
 
-Write-Host -Object $BenchmarkResult
+for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
+	Set-Location -Path $ExecutablePath
+	$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags | Out-String -Stream
+	Set-Location -Path $CurrentLocation
+
+	$ResultLines = $BenchmarkResult.Count
+	$Line = 0
+	for (; $Line -lt $ResultLines -and !$BenchmarkResult[$Line].StartsWith('-'); $Line++) {
+	}
+
+	while ($BenchmarkResult[$Line].StartsWith('-')) {
+		$GroupName = $BenchmarkResult[$Line + 1]
+		if (!$BenchmarkObjects.ContainsKey($GroupName)) {
+			$BenchmarkObjects.Add($GroupName, @{})
+		}
+		$Line += 10
+
+		while ($BenchmarkResult[$Line].Length -gt 0) {
+			$FunctionName = ([regex]"^(.*?) +\d").Matches($BenchmarkResult[$Line + 0])[0].Groups[1].Value
+			if (!$BenchmarkObjects[$GroupName].ContainsKey($FunctionName)) {
+				$BenchmarkObjects[$GroupName].Add($FunctionName, [System.Collections.ArrayList]@())
+			}
+			$BenchmarkObjects[$GroupName][$FunctionName].Add(
+				([regex]"^ +(\d+\.\d+ [mnu]s)").Matches($BenchmarkResult[$Line + 1])[0].Groups[1].Value
+			) | Out-Null
+			$Line += 4
+		}
+		$Line += 1
+	}
+	
+}
+
+foreach ($GroupKey in $BenchmarkObjects.Keys) {
+	"Group: $GroupKey"
+	foreach ($FunctionKey in $BenchmarkObjects[$GroupKey].Keys) {
+		"Function: $FunctionKey"
+		$BenchmarkObjects[$GroupKey][$FunctionKey]
+	}
+}
