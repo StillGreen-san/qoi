@@ -59,9 +59,13 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 			if (!$BenchmarkObjects[$GroupName].ContainsKey($FunctionName)) {
 				$BenchmarkObjects[$GroupName].Add($FunctionName, [System.Collections.ArrayList]@())
 			}
-			$BenchmarkObjects[$GroupName][$FunctionName].Add(
-				([regex]"^ +(\d+\.\d+ [mnu]s)").Matches($BenchmarkResult[$Line + 1])[0].Groups[1].Value
-			) | Out-Null
+			$Matches = ([regex]"([\d\.]+) ([mnu]s)").Matches($BenchmarkResult[$Line + 1])
+			[double]$MicroSeconds = $Matches[0].Groups[1].Value
+			switch ($Matches[0].Groups[2].Value) {
+				"ms" { $MicroSeconds *= 1000 }
+				"ns" { $MicroSeconds *= 0.001 }
+			}
+			$BenchmarkObjects[$GroupName][$FunctionName].Add($MicroSeconds) | Out-Null
 			$Line += 4
 		}
 		$Line += 1
@@ -70,9 +74,14 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 }
 
 foreach ($GroupKey in $BenchmarkObjects.Keys) {
-	"Group: $GroupKey"
+	"$GroupKey"
 	foreach ($FunctionKey in $BenchmarkObjects[$GroupKey].Keys) {
-		"Function: $FunctionKey"
-		$BenchmarkObjects[$GroupKey][$FunctionKey]
+		$Mean = ($BenchmarkObjects[$GroupKey][$FunctionKey] | Measure-Object -Average).Average
+		switch ($Mean) {
+			{ $_ -ge 1000 } { $Mean = "$($Mean / 1000) ms" }
+			{ $_ -le 0.001 } { $Mean = "$($Mean * 1000) ns" }
+			Default { $Mean = "$Mean us" }
+		}
+		"    $FunctionKey = $Mean"
 	}
 }
