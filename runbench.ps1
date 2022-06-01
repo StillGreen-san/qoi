@@ -43,6 +43,11 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 	Set-Location -Path $CurrentLocation
 
 	$ResultLines = $BenchmarkResult.Count
+	if ($ResultLines -lt 15) {
+		Write-Error -Message "No Tests were Run"
+		return
+	}
+
 	$Line = 0
 	for (; $Line -lt $ResultLines -and !$BenchmarkResult[$Line].StartsWith('-'); $Line++) {
 	}
