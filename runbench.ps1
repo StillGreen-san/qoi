@@ -1,10 +1,3 @@
-# pcre2
-# trim /g (-{70,}\X*\n\n\n)=+\X*
-# benches /gU (-{70,}\n\N*\n-{70,}\X*\n\n\n)+
-# benchname /gU -{70,}\n(\N*)\n-{70,}
-# benchstats /gU \n(\N+)  *(\d+)  *(\d+)  *([\d\.]+ [mns]+)\n +([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)\n +([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)  *([\d\.]+ [mns]+)\n
-#>
-
 Param(
 	[Parameter(Mandatory)]
 	[string]$BenchmarkExecutable,
