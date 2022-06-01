@@ -71,17 +71,17 @@ std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
 std::unique_ptr<IImageData> encode(const std::vector<uint8_t>& raw, const ImageDescription& desc);
 } // namespace shadowmitia::libqoi
 
-//namespace shraiwi::miniqoi
-//{
-//namespace c
-//{
-//std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-//} // namespace c
-//namespace cpp
-//{
-//std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
-//} // namespace cpp
-//} // namespace shraiwi::miniqoi
+namespace shraiwi::miniqoi
+{
+namespace c
+{
+std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
+} // namespace c
+namespace cpp
+{
+std::unique_ptr<IImageData> decode(const std::vector<uint8_t>& qoi);
+} // namespace cpp
+} // namespace shraiwi::miniqoi
 
 namespace wx257osn2::qoixx
 {

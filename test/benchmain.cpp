@@ -48,8 +48,8 @@ TEST_CASE("decode quick", "[quick][decode]")
 	QOI_BENCH_DECODE_QUICK(pfusik::qoici::c::decode, testData);
 	QOI_BENCH_DECODE_QUICK(pfusik::qoici::cpp::decode, testData);
 	QOI_BENCH_DECODE_QUICK(shadowmitia::libqoi::decode, testData);
-	//	QOI_BENCH_DECODE_QUICK(shraiwi::miniqoi::c::decode, testData);
-	//	QOI_BENCH_DECODE_QUICK(shraiwi::miniqoi::cpp::decode, testData);
+	QOI_BENCH_DECODE_QUICK(shraiwi::miniqoi::c::decode, testData);
+	QOI_BENCH_DECODE_QUICK(shraiwi::miniqoi::cpp::decode, testData);
 	QOI_BENCH_DECODE_QUICK(wx257osn2::qoixx::decode, testData);
 }
 TEST_CASE("decode full", "[full][decode]")
@@ -62,8 +62,8 @@ TEST_CASE("decode full", "[full][decode]")
 	QOI_BENCH_DECODE_FULL(pfusik::qoici::c::decode, testData);
 	QOI_BENCH_DECODE_FULL(pfusik::qoici::cpp::decode, testData);
 	QOI_BENCH_DECODE_FULL(shadowmitia::libqoi::decode, testData);
-	//	QOI_BENCH_DECODE(shraiwi::miniqoi::c::decode, testData);
-	//	QOI_BENCH_DECODE(shraiwi::miniqoi::cpp::decode, testData);
+	QOI_BENCH_DECODE_FULL(shraiwi::miniqoi::c::decode, testData);
+	QOI_BENCH_DECODE_FULL(shraiwi::miniqoi::cpp::decode, testData);
 	QOI_BENCH_DECODE_FULL(wx257osn2::qoixx::decode, testData);
 }
 
