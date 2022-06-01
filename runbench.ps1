@@ -33,7 +33,7 @@ $BenchmarkObjects = @{}
 for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 	Set-Location -Path $ExecutablePath
 	$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags | Out-String -Stream
-	Set-Location -Path $CurrentLocation
+	Set-Location -Path $CurrentLocation # TODO random order?
 
 	$ResultLines = $BenchmarkResult.Count
 	if ($ResultLines -lt 15) {
@@ -76,10 +76,10 @@ foreach ($GroupKey in $BenchmarkObjects.Keys) {
 	foreach ($FunctionKey in $BenchmarkObjects[$GroupKey].Keys) {
 		$Mean = ($BenchmarkObjects[$GroupKey][$FunctionKey] | Measure-Object -Average).Average
 		switch ($Mean) {
-			{ $_ -ge 1000 } { $Mean = "$($Mean / 1000) ms" }
-			{ $_ -le 0.001 } { $Mean = "$($Mean * 1000) ns" }
-			Default { $Mean = "$Mean us" }
+			{ $_ -ge 1000 } { $Mean = "$([Math]::Round($Mean / 1000, 4)) ms" }
+			{ $_ -le 0.001 } { $Mean = "$([Math]::Round($Mean * 1000, 4)) ns" }
+			Default { $Mean = "$([Math]::Round($Mean, 4)) us" }
 		}
 		"    $FunctionKey = $Mean"
-	}
+	} # TODO format table
 }
