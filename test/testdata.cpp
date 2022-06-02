@@ -11,7 +11,7 @@ void load(const std::filesystem::path& path, TestData::Triplet& data)
 {
 	if(!std::filesystem::exists(path))
 	{
-		throw std::exception{"file not found"};
+		throw std::runtime_error{"file not found"};
 	}
 
 	std::basic_ifstream<uint8_t> file(path, std::ios_base::in | std::ios_base::binary);

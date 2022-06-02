@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <array>
-#include <exception> // TODO do without?
+#include <stdexcept> // TODO do without?
 #include <iterator>
 #include <vector>
 
@@ -142,14 +142,14 @@ Header readHeader(const TContainer& qoiData)
 {
 	if(qoiData.size() < constants::headerSize)
 	{
-		throw std::exception{"insufficient data"};
+		throw std::runtime_error{"insufficient data"};
 	}
 
 	auto qoiIt = next(cbegin(qoiData), constants::magicBytes);
 
 	if(!std::equal(cbegin(qoiData), qoiIt, std::cbegin(Header::magic)))
 	{
-		throw std::exception{"magic bytes mismatch"};
+		throw std::runtime_error{"magic bytes mismatch"};
 	}
 
 	Header header;
@@ -173,7 +173,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 {
 	if(qoiData.size() < constants::headerSize + constants::endMarkerSize)
 	{
-		throw std::exception{"insufficient data"};
+		throw std::runtime_error{"insufficient data"};
 	}
 
 	DataPair<TOutContainer> dataPair{readHeader(qoiData)};
@@ -236,7 +236,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			advance(qoiIt, 1);
 			break;
 		default:
-			throw std::exception{"unknown chunk"};
+			throw std::runtime_error{"unknown chunk"};
 		}
 	}
 
