@@ -24,16 +24,19 @@ for ($i = $BenchmarkTags.Count - 1; $i -ge 0 ; $i--) {
 	if (!$BenchmarkTags[$i].StartsWith('[') -or !$BenchmarkTags[$i].EndsWith(']')) {
 		$Tag = $BenchmarkTags[$i]
 		$BenchmarkTags[$i] = "[$Tag]"
-	}
+	} # TODO make comma separated?
 }
 
 $BenchmarkObjects = @{}
 [string]$CurrentLocation = Get-Location
 
 for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
+	[int]$Progress = ($RunNumber / $RunCount) * 100
+	Write-Progress -Activity "Running Benchmarks" -Status "$RunNumber / $RunCount" -PercentComplete $Progress
+
 	Set-Location -Path $ExecutablePath
-	$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags | Out-String -Stream
-	Set-Location -Path $CurrentLocation # TODO random order?
+	$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags --order rand --rng-seed time | Out-String -Stream
+	Set-Location -Path $CurrentLocation
 
 	$ResultLines = $BenchmarkResult.Count
 	if ($ResultLines -lt 15) {
