@@ -2,6 +2,8 @@
 
 #include <qoi.h>
 
+#include <cstdlib>
+
 namespace impl::phoboslab::qoi
 {
 struct Decoder : public IImageData

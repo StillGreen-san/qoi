@@ -15,7 +15,7 @@ check_ipo_supported(
 if( ipo_supported )
 	set( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
 else( )
-	message( SEND_ERROR "IPO is not supported: ${ipo_output}" )
+	message( STATUS "IPO is not supported: ${ipo_output}" )
 endif( )
 
 # colored compiler output
