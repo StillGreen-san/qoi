@@ -4,8 +4,8 @@ Param(
 	[Parameter(Mandatory)]
 	[int]$RunCount,
 	[Parameter(Mandatory)]
-	[ValidateSet('SGS', 'Quick', 'Full', 'Encode', 'Decode')]
-	[string[]]$BenchmarkTags
+	[ValidateSet('all', 'ext', 'sgs')]
+	[string]$BenchmarkTag
 )
 
 if (!(Test-Path -Path $BenchmarkExecutable)) {
@@ -20,12 +20,7 @@ if (!(Split-Path -Path $BenchmarkExecutable -IsAbsolute)) {
 [string]$ExecutablePath = Split-Path -Path $BenchmarkExecutable
 [string]$ExecutableFile = Split-Path -Path $BenchmarkExecutable -Leaf
 
-for ($i = $BenchmarkTags.Count - 1; $i -ge 0 ; $i--) {
-	if (!$BenchmarkTags[$i].StartsWith('[') -or !$BenchmarkTags[$i].EndsWith(']')) {
-		$Tag = $BenchmarkTags[$i]
-		$BenchmarkTags[$i] = "[$Tag]"
-	} # TODO make comma separated?
-}
+$TagToRun = "[$BenchmarkTag]"
 
 $BenchmarkObjects = @{}
 [string]$CurrentLocation = Get-Location
@@ -35,7 +30,7 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 	Write-Progress -Activity "Running Benchmarks" -Status "$RunNumber / $RunCount" -PercentComplete $Progress
 
 	Set-Location -Path $ExecutablePath
-	$BenchmarkResult = &"./$ExecutableFile" $BenchmarkTags --order rand --rng-seed time | Out-String -Stream
+	$BenchmarkResult = &"./$ExecutableFile" $TagToRun --order rand --rng-seed time | Out-String -Stream
 	Set-Location -Path $CurrentLocation
 
 	$ResultLines = $BenchmarkResult.Count
