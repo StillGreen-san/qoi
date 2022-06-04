@@ -44,40 +44,32 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 	}
 
 	while ($BenchmarkResult[$Line].StartsWith('-')) {
-		$GroupName = $BenchmarkResult[$Line + 1]
-		if (!$BenchmarkObjects.ContainsKey($GroupName)) {
-			$BenchmarkObjects.Add($GroupName, @{})
-		}
 		$Line += 10
 
 		while ($BenchmarkResult[$Line].Length -gt 0) {
 			$FunctionName = ([regex]"^(.*?) +\d").Matches($BenchmarkResult[$Line + 0])[0].Groups[1].Value
-			if (!$BenchmarkObjects[$GroupName].ContainsKey($FunctionName)) {
-				$BenchmarkObjects[$GroupName].Add($FunctionName, [System.Collections.ArrayList]@())
+			if (!$BenchmarkObjects.ContainsKey($FunctionName)) {
+				$BenchmarkObjects.Add($FunctionName, [System.Collections.ArrayList]@())
 			}
-			$Matches = ([regex]"([\d\.]+) ([mnu]s)").Matches($BenchmarkResult[$Line + 1])
-			[double]$MicroSeconds = $Matches[0].Groups[1].Value
-			switch ($Matches[0].Groups[2].Value) {
+			$MatchResult = ([regex]"([\d\.]+) ([mnu]s)").Matches($BenchmarkResult[$Line + 1])
+			[double]$MicroSeconds = $MatchResult[0].Groups[1].Value
+			switch ($MatchResult[0].Groups[2].Value) {
 				"ms" { $MicroSeconds *= 1000 }
 				"ns" { $MicroSeconds *= 0.001 }
 			}
-			$BenchmarkObjects[$GroupName][$FunctionName].Add($MicroSeconds) | Out-Null
+			$BenchmarkObjects[$FunctionName].Add($MicroSeconds) | Out-Null
 			$Line += 4
 		}
 		$Line += 1
 	}
-	
 }
 
-foreach ($GroupKey in $BenchmarkObjects.Keys) {
-	"$GroupKey"
-	foreach ($FunctionKey in $BenchmarkObjects[$GroupKey].Keys) {
-		$Mean = ($BenchmarkObjects[$GroupKey][$FunctionKey] | Measure-Object -Average).Average
-		switch ($Mean) {
-			{ $_ -ge 1000 } { $Mean = "$([Math]::Round($Mean / 1000, 4)) ms" }
-			{ $_ -le 0.001 } { $Mean = "$([Math]::Round($Mean * 1000, 4)) ns" }
-			Default { $Mean = "$([Math]::Round($Mean, 4)) us" }
-		}
-		"    $FunctionKey = $Mean"
-	} # TODO format table
-}
+foreach ($FunctionKey in $BenchmarkObjects.Keys) {
+	$Mean = ($BenchmarkObjects[$FunctionKey] | Measure-Object -Average).Average
+	switch ($Mean) {
+		{ $_ -ge 1000 } { $Mean = "$([Math]::Round($Mean / 1000, 4)) ms" }
+		{ $_ -le 0.001 } { $Mean = "$([Math]::Round($Mean * 1000, 4)) ns" }
+		Default { $Mean = "$([Math]::Round($Mean, 4)) us" }
+	}
+	"$FunctionKey = $Mean"
+} # TODO format table
