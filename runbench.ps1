@@ -5,7 +5,9 @@ Param(
 	[int]$RunCount,
 	[Parameter(Mandatory)]
 	[ValidateSet('all', 'ext', 'sgs')]
-	[string]$BenchmarkTag
+	[string]$BenchmarkTag,
+	[ValidateSet('reset')]
+	[string]$Reset
 )
 
 if (!(Test-Path -Path $BenchmarkExecutable)) {
@@ -19,10 +21,27 @@ if (!(Split-Path -Path $BenchmarkExecutable -IsAbsolute)) {
 
 [string]$ExecutablePath = Split-Path -Path $BenchmarkExecutable
 [string]$ExecutableFile = Split-Path -Path $BenchmarkExecutable -Leaf
+[string]$ResultsPath = "$ExecutablePath/$ExecutableFile.json"
 
 $TagToRun = "[$BenchmarkTag]"
 
 $BenchmarkObjects = @{}
+
+if ($Reset) {
+	Remove-Item -Path $ResultsPath
+}
+elseif (Test-Path -Path $ResultsPath) {
+	$Content = Get-Content -Path $ResultsPath | ConvertFrom-Json -AsHashtable
+	foreach ($FunctionKey in $Content.Keys) {
+		if (!$BenchmarkObjects.ContainsKey($FunctionKey)) {
+			$BenchmarkObjects.Add($FunctionKey, [System.Collections.ArrayList]@())
+		}
+		foreach ($Time in $Content[$FunctionKey]) {
+			$BenchmarkObjects[$FunctionKey].Add($Time) | Out-Null
+		}
+	}
+}
+
 [string]$CurrentLocation = Get-Location
 
 for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
@@ -75,3 +94,5 @@ foreach ($FunctionKey in $BenchmarkObjects.Keys) {
 	}
 	"$FunctionKey = $Mean"
 } # TODO format table
+
+ConvertTo-Json -InputObject $BenchmarkObjects | Out-File -FilePath $ResultsPath
