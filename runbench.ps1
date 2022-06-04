@@ -56,6 +56,7 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 			switch ($MatchResult[0].Groups[2].Value) {
 				"ms" { $MicroSeconds *= 1000 }
 				"ns" { $MicroSeconds *= 0.001 }
+				"s" { $MicroSeconds *= 1000000 }
 			}
 			$BenchmarkObjects[$FunctionName].Add($MicroSeconds) | Out-Null
 			$Line += 4
@@ -67,6 +68,7 @@ for ($RunNumber = 1; $RunNumber -le $RunCount; $RunNumber++) {
 foreach ($FunctionKey in $BenchmarkObjects.Keys) {
 	$Mean = ($BenchmarkObjects[$FunctionKey] | Measure-Object -Average).Average
 	switch ($Mean) {
+		{ $_ -ge 1000000 } { $Mean = "$([Math]::Round($Mean / 1000000, 4)) s" }
 		{ $_ -ge 1000 } { $Mean = "$([Math]::Round($Mean / 1000, 4)) ms" }
 		{ $_ -le 0.001 } { $Mean = "$([Math]::Round($Mean * 1000, 4)) ns" }
 		Default { $Mean = "$([Math]::Round($Mean, 4)) us" }
