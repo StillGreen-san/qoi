@@ -21,11 +21,11 @@ struct Decoder : public IImageData
 	}
 	uint32_t width() override
 	{
-		return decoder.getWidth();
+		return static_cast<uint32_t>(decoder.getWidth());
 	}
 	uint32_t height() override
 	{
-		return decoder.getHeight();
+		return static_cast<uint32_t>(decoder.getHeight());
 	}
 	uint8_t channels() override
 	{
@@ -40,7 +40,7 @@ struct Decoder : public IImageData
 struct Encoder : public IImageData
 {
 	Encoder() = delete;
-	Encoder(const std::vector<uint8_t>& raw, ImageDescription description) : description{description}
+	Encoder(const std::vector<uint8_t>& raw, ImageDescription desc) : description{desc}
 	{
 		encoder.encode(static_cast<int>(description.width), static_cast<int>(description.height),
 		    reinterpret_cast<const int*>(raw.data()), alpha(description.channels), linear(description.colorspace));
@@ -51,7 +51,7 @@ struct Encoder : public IImageData
 	}
 	size_t size() override
 	{
-		return encoder.getEncodedSize();
+		return static_cast<size_t>(encoder.getEncodedSize());
 	}
 	uint32_t width() override
 	{

@@ -4,8 +4,8 @@
 
 #include <algorithm>
 #include <array>
-#include <stdexcept> // TODO do without?
 #include <iterator>
+#include <stdexcept> // TODO do without?
 #include <vector>
 
 // TODO constrain templates
@@ -61,7 +61,7 @@ template<typename TResult, typename TInt>
 inline TResult pushByte(TResult value, TInt byte)
 {
 	value <<= 8U;
-	return value | byte;
+	return value | static_cast<TResult>(byte);
 }
 
 template<typename TIterator>
@@ -176,7 +176,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 		throw std::runtime_error{"insufficient data"};
 	}
 
-	DataPair<TOutContainer> dataPair{readHeader(qoiData)};
+	DataPair<TOutContainer> dataPair{readHeader(qoiData), {}};
 	dataPair.data.reserve(helpers::rawBufferSize(dataPair.header));
 
 	const auto qoiEnd = std::prev(cend(qoiData), constants::endMarkerSize);
@@ -221,7 +221,8 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			break;
 		case constants::tagLuma:
 		{
-			const uint8_t greenDiff = (qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2)) - 32U;
+			const uint8_t greenDiff =
+			    static_cast<uint8_t>((qoiIt[0] & static_cast<uint8_t>(~constants::tagMask2)) - 32U);
 			lastPixel = helpers::Pixel{
 			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
 			    static_cast<uint8_t>(lastPixel.green + greenDiff),
@@ -346,7 +347,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 		}
 
 		data.push_back(constants::tagLuma | static_cast<uint8_t>(diffGreen + 32U));
-		data.push_back((diffRedLuma + 8U) << 4U | static_cast<uint8_t>(diffBlueLuma + 8U));
+		data.push_back(static_cast<uint8_t>((diffRedLuma + 8U) << 4U) | static_cast<uint8_t>(diffBlueLuma + 8U));
 	}
 
 	data.insert(end(data), 7, 0);

@@ -48,7 +48,7 @@ struct Encoder : public IImageData
 {
 	Encoder() = delete;
 	Encoder(const std::vector<uint8_t>& raw, ImageDescription desc) :
-	    description{desc.width,desc.height,desc.channels,desc.colorspace}
+	    description{desc.width, desc.height, desc.channels, desc.colorspace}
 	{
 		pixels = ::qoi_encode(raw.data(), &description, &length);
 	}
@@ -58,7 +58,7 @@ struct Encoder : public IImageData
 	}
 	size_t size() override
 	{
-		return length;
+		return static_cast<size_t>(length);
 	}
 	uint32_t width() override
 	{

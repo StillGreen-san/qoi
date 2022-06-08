@@ -21,11 +21,11 @@ struct Decoder : public IImageData
 	}
 	uint32_t width() override
 	{
-		return QOIDecoder_GetWidth(decoder);
+		return static_cast<uint32_t>(QOIDecoder_GetWidth(decoder));
 	}
 	uint32_t height() override
 	{
-		return QOIDecoder_GetHeight(decoder);
+		return static_cast<uint32_t>(QOIDecoder_GetHeight(decoder));
 	}
 	uint8_t channels() override
 	{
@@ -44,11 +44,10 @@ struct Decoder : public IImageData
 struct Encoder : public IImageData
 {
 	Encoder() = delete;
-	Encoder(const std::vector<uint8_t>& raw, ImageDescription description) :
-	    encoder{::QOIEncoder_New()}, description{description}
+	Encoder(const std::vector<uint8_t>& raw, ImageDescription desc) : encoder{::QOIEncoder_New()}, description{desc}
 	{
-		QOIEncoder_Encode(encoder, static_cast<int>(description.width), static_cast<int>(description.height), reinterpret_cast<const int*>(raw.data()),
-		    alpha(description.channels), linear(description.colorspace));
+		QOIEncoder_Encode(encoder, static_cast<int>(description.width), static_cast<int>(description.height),
+		    reinterpret_cast<const int*>(raw.data()), alpha(description.channels), linear(description.colorspace));
 	}
 	const uint8_t* data() override
 	{
@@ -56,7 +55,7 @@ struct Encoder : public IImageData
 	}
 	size_t size() override
 	{
-		return QOIEncoder_GetEncodedSize(encoder);
+		return static_cast<size_t>(QOIEncoder_GetEncodedSize(encoder));
 	}
 	uint32_t width() override
 	{
