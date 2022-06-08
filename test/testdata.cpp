@@ -12,12 +12,13 @@ void load(const std::filesystem::path& path, TestData::Triplet& data)
 		throw std::runtime_error{"file not found"};
 	}
 
-	std::basic_ifstream<uint8_t> file(path, std::ios_base::in | std::ios_base::binary);
+	// needs to be char for compiler compatibility
+	std::basic_ifstream<char> file(path, std::ios_base::in | std::ios_base::binary);
 
 	const size_t fileSize = file_size(path);
 	data.qoi.resize(fileSize);
 
-	file.read(data.qoi.data(), static_cast<std::streamsize>(fileSize));
+	file.read(reinterpret_cast<char*>(data.qoi.data()), static_cast<std::streamsize>(fileSize));
 
 	std::unique_ptr<impl::IImageData> decoded = impl::phoboslab::qoi::decode(data.qoi);
 	data.raw.assign(decoded->data(),
