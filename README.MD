@@ -21,25 +21,23 @@ tests and benchmark do however make use of other libraries:
 for the purpose of benchmarking and testing all implementations are used through a common virtual interface,
 the timings below may therefore not reflect the best performance one could achieve
 
-_(there is also quite a bit of variance in results on my machine, even when averaging over multiple runs)_
-
 all functions are benched against a set of example images, you can find
 [on the qoi website](https://qoiformat.org/qoi_test_images.zip), on an Intel i7-5820K (3.6GHz) Windows 10
 
-| encoding                       | msvc       | clang-cl   |
-|--------------------------------|------------|------------|
-| **stillgreensan::qoi::encode** | 36.6321 ms | 44.7250 ms |
-| phoboslab::qoi::encode         | 30.7396 ms | 28.1780 ms |
-| shadowmitia::libqoi::encode    | 39.0356 ms | 33.1281 ms |
-| wx257osn2::qoixx::encode       | 35.0958 ms | 27.3886 ms |
+| encoding                       | msvc       | clang-cl   | mingw      |
+|--------------------------------|------------|------------|------------|
+| **stillgreensan::qoi::encode** | 32.0666 ms | 41.5821 ms | 28.8637 ms |
+| phoboslab::qoi::encode         | 28.4051 ms | 26.3849 ms | 23.9919 ms |
+| shadowmitia::libqoi::encode    | 36.2259 ms | 32.4339 ms | 31.3426 ms |
+| wx257osn2::qoixx::encode       | 32.1062 ms | 26.3908 ms | 22.0142 ms |
 
-| decoding                       | msvc       | clang-cl   |
-|--------------------------------|------------|------------|
-| **stillgreensan::qoi::decode** | 32.2759 ms | 28.7773 ms |
-| phoboslab::qoi::decode         | 20.7712 ms | 23.1185 ms |
-| pfusik::qoici::c::decode       | 18.7147 ms | 18.2227 ms |
-| pfusik::qoici::cpp::decode     | 19.5511 ms | 19.8339 ms |
-| shadowmitia::libqoi::decode    | 22.7735 ms | 23.4334 ms |
-| shraiwi::miniqoi::c::decode    | 48.4286 ms | 49.3448 ms |
-| shraiwi::miniqoi::cpp::decode  | 50.7878 ms | 48.7711 ms |
-| wx257osn2::qoixx::decode       | 20.2520 ms | 16.4365 ms |
+| decoding                       | msvc       | clang-cl   | mingw      |
+|--------------------------------|------------|------------|------------|
+| **stillgreensan::qoi::decode** | 29.4812 ms | 27.1984 ms | 24.6699 ms |
+| phoboslab::qoi::decode         | 19.1761 ms | 21.6312 ms | 20.3470 ms |
+| pfusik::qoici::c::decode       | 17.3896 ms | 17.5273 ms | 16.3815 ms |
+| pfusik::qoici::cpp::decode     | 17.9252 ms | 18.5737 ms | 17.4916 ms |
+| shadowmitia::libqoi::decode    | 21.0683 ms | 22.1937 ms | 20.0901 ms |
+| shraiwi::miniqoi::c::decode    | 45.3839 ms | 47.1148 ms | 30.3102 ms |
+| shraiwi::miniqoi::cpp::decode  | 46.2561 ms | 47.5463 ms | 30.5549 ms |
+| wx257osn2::qoixx::decode       | 18.8729 ms | 15.9443 ms | 16.3083 ms |
