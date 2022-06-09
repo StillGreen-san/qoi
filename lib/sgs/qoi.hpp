@@ -30,16 +30,27 @@ constexpr uint8_t tagRun = 0b11000000;
 constexpr size_t tagRunMaxLength = 62;
 } // namespace constants
 
+/**
+ * @brief the amount of channels used (can be casted to their numeric value)
+ */
 enum class Channels : uint8_t
 {
 	RGB = 3,
 	RGBA = 4
 };
+
+/**
+ * @brief the colorspace used (does not change de/encoding)
+ */
 enum class Colorspace : uint8_t
 {
 	sRGB = 0,
 	Linear = 1
 };
+
+/**
+ * @brief holds basic information about the picture
+ */
 struct Header
 {
 	static constexpr std::array<uint8_t, constants::magicBytes> magic{'q', 'o', 'i', 'f'};
@@ -48,6 +59,11 @@ struct Header
 	Channels channels{Channels::RGBA};
 	Colorspace colorspace{Colorspace::Linear};
 };
+
+/**
+ * @brief pair type holding Header & picture data
+ * @tparam TData container type to store picture data
+ */
 template<typename TData>
 struct DataPair
 {
@@ -137,6 +153,13 @@ inline size_t index(Pixel pixel)
 }
 } // namespace helpers
 
+/**
+ * @brief tries to read header from QOI file data
+ * @tparam TContainer container type
+ * @param qoiData the QOI file data (passing only the header bytes is sufficient)
+ * @return Header type
+ * @throws std::runtime_error on insufficient data or magic bytes mismatch
+ */
 template<typename TContainer>
 Header readHeader(const TContainer& qoiData)
 {
@@ -168,6 +191,14 @@ Header readHeader(const TContainer& qoiData)
 	return header;
 }
 
+/**
+ * @brief tries to decode QOI file data
+ * @tparam TOutContainer container type for output
+ * @tparam TInContainer container type for input
+ * @param qoiData container with QOI file data (header, packets & endmarker)
+ * @return DataPair with Header & raw picture data
+ * @throws std::runtime_error on insufficient data or header error
+ */
 template<typename TOutContainer, typename TInContainer>
 DataPair<TOutContainer> decode(const TInContainer& qoiData)
 {
@@ -243,12 +274,28 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 
 	return dataPair;
 }
+
+/**
+ * @brief tries to decode QOI file data
+ * @tparam TContainer container type for in&output
+ * @param qoiData container with QOI file data (header, packets & endmarker)
+ * @return DataPair with Header & raw picture data
+ * @throws std::runtime_error on insufficient data or header error
+ */
 template<typename TContainer>
 inline DataPair<TContainer> decode(const TContainer& qoiData)
 {
 	return decode<TContainer, TContainer>(qoiData);
 }
 
+/**
+ * @brief tries to encode raw picture data
+ * @tparam TOutContainer container type for output
+ * @tparam TInContainer container type for input
+ * @param header basic information about the picture
+ * @param rawData raw picture data
+ * @return TOutContainer encoded QOI file data
+ */
 template<typename TOutContainer, typename TInContainer>
 TOutContainer encode(const Header& header, const TInContainer& rawData)
 {
@@ -269,7 +316,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 	data.push_back(static_cast<uint8_t>(header.colorspace));
 
 	const auto rawEnd = cend(rawData);
-	auto rawIt = cbegin(rawData);
+	auto rawIt = cbegin(rawData); // TODO check rawData size
 
 	std::array<helpers::Pixel, constants::previousPixelsSize> previousPixels{};
 	helpers::Pixel lastPixel{0, 0, 0, 255};
@@ -355,6 +402,14 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 
 	return data;
 }
+
+/**
+ * @brief tries to encode raw picture data
+ * @tparam TContainer container type for in&output
+ * @param header basic information about the picture
+ * @param rawData raw picture data
+ * @return TOutContainer encoded QOI file data
+ */
 template<typename TContainer>
 inline TContainer encode(const Header& header, const TContainer& rawData)
 {
