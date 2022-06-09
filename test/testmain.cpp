@@ -56,7 +56,7 @@ TEST_CASE("helpers")
 {
 	SECTION("pushByte")
 	{
-		using sgs::qoi::helpers::pushByte;
+		using sgs::qoi::detail::pushByte;
 
 		uint32_t value = 0;
 		value = pushByte(value, 0x01);
@@ -71,7 +71,7 @@ TEST_CASE("helpers")
 
 	SECTION("read32BE")
 	{
-		using sgs::qoi::helpers::read32BE;
+		using sgs::qoi::detail::read32BE;
 		std::array<uint8_t, 4> bytes{0xAA, 0xBB, 0xCC, 0xDD};
 
 		REQUIRE(read32BE(bytes.begin()) == 0xAABBCCDD);
@@ -79,7 +79,7 @@ TEST_CASE("helpers")
 
 	SECTION("writeBE")
 	{
-		using sgs::qoi::helpers::writeBE;
+		using sgs::qoi::detail::writeBE;
 		const std::array<uint8_t, 4> target{0xAA, 0xBB, 0xCC, 0xDD};
 		std::array<uint8_t, 4> bytes{0, 0, 0, 0};
 
