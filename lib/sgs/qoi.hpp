@@ -151,6 +151,21 @@ inline size_t index(Pixel pixel)
 {
 	return (pixel.red * 3U + pixel.green * 5U + pixel.blue * 7U + pixel.alpha * 11U) & 0b111111U;
 }
+
+template<typename TContainer>
+inline auto reserve_impl(TContainer& container, size_t size) -> decltype(container.reserve(size), void())
+{
+	container.reserve(size);
+}
+template<typename TContainer>
+inline void reserve_impl([[maybe_unused]] const TContainer& container, [[maybe_unused]] size_t size)
+{
+}
+template<typename TContainer>
+void reserve(TContainer& container, size_t size)
+{
+	reserve_impl(container, size);
+}
 } // namespace detail
 
 /**
@@ -208,7 +223,8 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 	}
 
 	DataPair<TOutContainer> dataPair{readHeader(qoiData), {}};
-	dataPair.data.reserve(detail::rawBufferSize(dataPair.header));
+	const size_t reservedSize = detail::rawBufferSize(dataPair.header);
+	detail::reserve(dataPair.data, reservedSize);
 
 	const auto qoiEnd = std::prev(cend(qoiData), detail::endMarkerSize);
 	auto qoiIt = std::next(cbegin(qoiData), detail::headerSize);
@@ -217,7 +233,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 	detail::Pixel lastPixel{0, 0, 0, 255};
 
 	// TODO handle corrupted data (chunks of wrong size)
-	for(size_t target = dataPair.data.capacity(); qoiIt != qoiEnd && dataPair.data.size() < target;)
+	for(const size_t target = reservedSize; qoiIt != qoiEnd && dataPair.data.size() < target;)
 	{
 		if(qoiIt[0] == detail::tagRGB)
 		{
@@ -252,8 +268,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			break;
 		case detail::tagLuma:
 		{
-			const uint8_t greenDiff =
-			    static_cast<uint8_t>((qoiIt[0] & static_cast<uint8_t>(~detail::tagMask2)) - 32U);
+			const uint8_t greenDiff = static_cast<uint8_t>((qoiIt[0] & static_cast<uint8_t>(~detail::tagMask2)) - 32U);
 			lastPixel = detail::Pixel{
 			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
 			    static_cast<uint8_t>(lastPixel.green + greenDiff),
@@ -300,7 +315,7 @@ template<typename TOutContainer, typename TInContainer>
 TOutContainer encode(const Header& header, const TInContainer& rawData)
 {
 	TOutContainer data;
-	data.reserve(detail::qoiBufferSizeMin(header));
+	detail::reserve(data, detail::rawBufferSize(header));
 
 	data.insert(end(data), std::cbegin(Header::magic), std::cend(Header::magic));
 
@@ -329,8 +344,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 		if(currentPixel == lastPixel)
 		{
 			uint8_t runCount = 1;
-			for(;
-			    next(rawIt, static_cast<ptrdiff_t>(header.channels)) != rawEnd && runCount < detail::tagRunMaxLength;
+			for(; next(rawIt, static_cast<ptrdiff_t>(header.channels)) != rawEnd && runCount < detail::tagRunMaxLength;
 			    ++runCount, advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
 			{
 				auto rawNext = next(rawIt, static_cast<ptrdiff_t>(header.channels));
@@ -410,7 +424,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
  * @param rawData raw picture data
  * @return TOutContainer encoded QOI file data
  */
-template<typename TContainer>
+template<typename TContainer> // TODO resolve ambiguity for de/encode<vector<T>>() called with vector<T>
 inline TContainer encode(const Header& header, const TContainer& rawData)
 {
 	return encode<TContainer, TContainer>(header, rawData);

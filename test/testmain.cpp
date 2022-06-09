@@ -200,6 +200,12 @@ TEST_CASE("decode")
 			CHECK(dataPair.header == testData.rng01.desc);
 			CHECK(dataPair.data == testData.rng01.raw);
 		}
+		{
+			auto dataPair = decode<std::deque<uint8_t>>(testData.rng01.qoi);
+			CHECK(dataPair.header == testData.rng01.desc);
+			std::vector<uint8_t> copy(dataPair.data.begin(), dataPair.data.end());
+			CHECK(copy == testData.rng01.raw);
+		}
 	}
 }
 
@@ -282,6 +288,11 @@ TEST_CASE("encode")
 			std::deque<uint8_t> container(testData.rng01.raw.begin(), testData.rng01.raw.end());
 			auto data = encode<std::vector<uint8_t>>(toHeader(testData.rng01.desc), container);
 			CHECK(data == testData.rng01.qoi);
+		}
+		{
+			auto data = encode<std::deque<uint8_t>>(toHeader(testData.rng01.desc), testData.rng01.raw);
+			std::vector<uint8_t> copy(data.begin(), data.end());
+			CHECK(copy == testData.rng01.qoi);
 		}
 	}
 }
