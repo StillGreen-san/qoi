@@ -5,6 +5,35 @@ templated, header only, operating on containers, C++17(could probably be lower)
 
 ---
 
+\#include [<sgs/qoi.hpp>](./lib/sgs/qoi.hpp)
+```c++
+/// decoding
+ std::vector<uint8_t> data;
+ // load qoi file data
+ sgs::qoi::DataPair decoded = sgs::qoi::decode(data);
+ // decoded.data (raw pixel data)
+ // decoded.header (width, height, channels, colorspace)
+ sgs::qoi::Header header = sgs::qoi::readHeader(data);
+ // header (width, height, channels, colorspace)
+
+/// encoding
+ std::vector<uint8_t> data;
+ // load raw pixel data
+ sgs::qoi::Header header{
+     300, 200, // width, height
+     sgs::qoi::Channels::RGB,
+     sgs::qoi::Colorspace::Linear
+ };
+ std::vector encoded = sgs::qoi::encode(header, data);
+ // encoded (QOI file data (header, packets & endmarker))
+
+/// return container type different from input
+ sgs::qoi::DataPair decoded = sgs::qoi::decode<std::deque<uint8_t>>(data);
+ std::deque encoded = sgs::qoi::encode<std::deque<uint8_t>>(header, data);
+```
+
+---
+
 using the library itself has no dependencies beyond the standard library
 
 tests and benchmark do however make use of other libraries:
@@ -21,7 +50,7 @@ tests and benchmark do however make use of other libraries:
 for the purpose of benchmarking and testing all implementations are used through a common virtual interface,
 the timings below may therefore not reflect the best performance one could achieve
 
-all functions are benched against a set of example images, you can find
+all functions are benched against a set of example images, that you can find
 [on the qoi website](https://qoiformat.org/qoi_test_images.zip), on an Intel i7-5820K (3.6GHz) Windows 10
 
 | encoding                       | msvc       | clang-cl   | mingw      |
