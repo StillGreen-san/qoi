@@ -5,9 +5,17 @@ templated, header only, operating on containers, C++17(could probably be lower)
 
 ---
 
-\#include [<sgs/qoi.hpp>](./lib/sgs/qoi.hpp)
+```cmake
+target_link_libraries( ${Target} PRIVATE sgs::qoi )
+```
+
 ```c++
-/// decoding
+#include <sgs/qoi.hpp>
+```
+
+decoding
+
+```c++
  std::vector<uint8_t> data;
  // load qoi file data
  sgs::qoi::DataPair decoded = sgs::qoi::decode(data);
@@ -15,8 +23,11 @@ templated, header only, operating on containers, C++17(could probably be lower)
  // decoded.header (width, height, channels, colorspace)
  sgs::qoi::Header header = sgs::qoi::readHeader(data);
  // header (width, height, channels, colorspace)
+```
 
-/// encoding
+encoding
+
+```c++
  std::vector<uint8_t> data;
  // load raw pixel data
  sgs::qoi::Header header{
@@ -26,8 +37,11 @@ templated, header only, operating on containers, C++17(could probably be lower)
  };
  std::vector encoded = sgs::qoi::encode(header, data);
  // encoded (QOI file data (header, packets & endmarker))
+```
 
-/// return container type different from input
+specifying the output container type
+
+```c++
  sgs::qoi::DataPair decoded = sgs::qoi::decode<std::deque<uint8_t>>(data);
  std::deque encoded = sgs::qoi::encode<std::deque<uint8_t>>(header, data);
 ```
@@ -46,6 +60,8 @@ tests and benchmark do however make use of other libraries:
 | [ShadowMitia/libqoi](https://github.com/ShadowMitia/libqoi) | [MIT](https://github.com/ShadowMitia/libqoi/blob/main/LICENSE)   | C++         | bench        |
 | [wx257osn2/qoixx](https://github.com/wx257osn2/qoixx)       | [MIT](https://github.com/wx257osn2/qoixx/blob/master/LICENSE)    | C++20       | bench        |
 | [shraiwi/mini-qoi](https://github.com/shraiwi/mini-qoi)     | [MIT](https://github.com/shraiwi/mini-qoi/blob/master/LICENSE)   | C, (C++)    | bench        |
+
+to build benchmarks and tests enable the cmake options `ENABLE_BENCHMARK` & `ENABLE_TESTS`
 
 for the purpose of benchmarking and testing all implementations are used through a common virtual interface,
 the timings below may therefore not reflect the best performance one could achieve
