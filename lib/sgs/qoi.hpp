@@ -114,25 +114,26 @@ inline size_t qoiBufferSizeMin(const Header& header)
 struct Pixel
 {
 	Pixel() = default;
-	Pixel(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) : red{red}, green{green}, blue{blue}, alpha{alpha}
+	Pixel(uint8_t red_, uint8_t green_, uint8_t blue_, uint8_t alpha_) // NOLINT(bugprone-easily-swappable-parameters)
+	    : red{red_}, green{green_}, blue{blue_}, alpha{alpha_}
 	{
 	}
 	template<typename TIter>
-	Pixel(TIter iter) :
+	explicit Pixel(TIter iter) :
 	    red{static_cast<uint8_t>(*iter++)}, green{static_cast<uint8_t>(*iter++)}, blue{static_cast<uint8_t>(*iter++)},
 	    alpha{static_cast<uint8_t>(*iter)}
 	{
 	}
 	template<typename TIter>
-	Pixel(TIter iter, uint8_t alpha) :
+	Pixel(TIter iter, uint8_t alpha_) :
 	    red{static_cast<uint8_t>(*iter++)}, green{static_cast<uint8_t>(*iter++)}, blue{static_cast<uint8_t>(*iter)},
-	    alpha{alpha}
+	    alpha{alpha_}
 	{
 	}
 	template<typename TIter>
-	Pixel(TIter iter, uint8_t alpha, const Header& header) :
+	Pixel(TIter iter, uint8_t alpha_, const Header& header) :
 	    red{static_cast<uint8_t>(*iter++)}, green{static_cast<uint8_t>(*iter++)}, blue{static_cast<uint8_t>(*iter++)},
-	    alpha{header.channels == Channels::RGBA ? static_cast<uint8_t>(*iter) : alpha}
+	    alpha{header.channels == Channels::RGBA ? static_cast<uint8_t>(*iter) : alpha_}
 	{
 	}
 	uint8_t red = 0;
