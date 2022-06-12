@@ -9,7 +9,6 @@
 #include <vector>
 
 // TODO constrain templates
-// TODO improve container support
 // TODO add noexcept where possible
 
 namespace sgs::qoi
@@ -258,7 +257,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 	// TODO handle corrupted data (chunks of wrong size)
 	for(const size_t target = reservedSize; qoiIt != qoiEnd && dataPair.data.size() < target;)
 	{
-		if(qoiIt[0] == detail::tagRGB)
+		if(*qoiIt == detail::tagRGB)
 		{
 			lastPixel = detail::Pixel(std::next(qoiIt), lastPixel.alpha);
 			detail::push_back(dataPair, lastPixel);
@@ -266,7 +265,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			advance(qoiIt, 4);
 			continue;
 		}
-		if(qoiIt[0] == detail::tagRGBA)
+		if(*qoiIt == detail::tagRGBA)
 		{
 			lastPixel = detail::Pixel(std::next(qoiIt));
 			detail::push_back(dataPair, lastPixel);
@@ -274,35 +273,36 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			advance(qoiIt, 5);
 			continue;
 		}
-		switch(qoiIt[0] & detail::tagMask2)
+		switch(*qoiIt & detail::tagMask2)
 		{
 		case detail::tagIndex:
-			lastPixel = previousPixels[qoiIt[0]];
+			lastPixel = previousPixels[*qoiIt];
 			detail::push_back(dataPair, lastPixel);
 			advance(qoiIt, 1);
 			break;
 		case detail::tagDiff:
-			lastPixel = detail::Pixel(static_cast<uint8_t>(lastPixel.red + (((qoiIt[0] & 0b00110000U) >> 4U) - 2U)),
-			    static_cast<uint8_t>(lastPixel.green + (((qoiIt[0] & 0b00001100U) >> 2U) - 2U)),
-			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[0] & 0b00000011U) - 2U)), lastPixel.alpha);
+			lastPixel = detail::Pixel(static_cast<uint8_t>(lastPixel.red + (((*qoiIt & 0b00110000U) >> 4U) - 2U)),
+			    static_cast<uint8_t>(lastPixel.green + (((*qoiIt & 0b00001100U) >> 2U) - 2U)),
+			    static_cast<uint8_t>(lastPixel.blue + ((*qoiIt & 0b00000011U) - 2U)), lastPixel.alpha);
 			detail::push_back(dataPair, lastPixel);
 			previousPixels[detail::index(lastPixel)] = lastPixel;
 			advance(qoiIt, 1);
 			break;
 		case detail::tagLuma:
 		{
-			const uint8_t greenDiff = static_cast<uint8_t>((qoiIt[0] & detail::dataMask2) - 32U);
-			lastPixel = detail::Pixel(
-			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
-			    static_cast<uint8_t>(lastPixel.green + greenDiff),
-			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[1] & 0b00001111U) - 8U) + greenDiff), lastPixel.alpha);
+			const auto greenDiff = static_cast<uint8_t>((*qoiIt & detail::dataMask2) - 32U);
+			const auto qoiNext = static_cast<uint8_t>(*std::next(qoiIt));
+			lastPixel =
+			    detail::Pixel(static_cast<uint8_t>(lastPixel.red + (((qoiNext & 0b11110000U) >> 4U) - 8U) + greenDiff),
+			        static_cast<uint8_t>(lastPixel.green + greenDiff),
+			        static_cast<uint8_t>(lastPixel.blue + ((qoiNext & 0b00001111U) - 8U) + greenDiff), lastPixel.alpha);
 			detail::push_back(dataPair, lastPixel);
 			previousPixels[detail::index(lastPixel)] = lastPixel;
 			advance(qoiIt, 2);
 			break;
 		}
 		case detail::tagRun:
-			detail::push_back(dataPair, lastPixel, (qoiIt[0] & detail::dataMask2) + 1);
+			detail::push_back(dataPair, lastPixel, (*qoiIt & detail::dataMask2) + 1);
 			advance(qoiIt, 1);
 			break;
 		default:

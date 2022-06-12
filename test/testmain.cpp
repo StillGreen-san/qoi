@@ -3,6 +3,8 @@
 
 #include <array>
 #include <deque>
+#include <forward_list>
+#include <list>
 #include <ostream>
 
 bool operator==(const sgs::qoi::Header& sgsHeader, const impl::ImageDescription& testHeader) noexcept
@@ -206,6 +208,12 @@ TEST_CASE("decode")
 			std::vector<uint8_t> copy(dataPair.data.begin(), dataPair.data.end());
 			CHECK(copy == testData.rng01.raw);
 		}
+		{
+			std::list<uint8_t> container(testData.rng02.qoi.begin(), testData.rng02.qoi.end());
+			auto dataPair = decode<std::vector<uint8_t>>(container);
+			CHECK(dataPair.header == testData.rng02.desc);
+			CHECK(dataPair.data == testData.rng02.raw);
+		}
 	}
 }
 
@@ -293,6 +301,11 @@ TEST_CASE("encode")
 			auto data = encode<std::deque<uint8_t>>(toHeader(testData.rng01.desc), testData.rng01.raw);
 			std::vector<uint8_t> copy(data.begin(), data.end());
 			CHECK(copy == testData.rng01.qoi);
+		}
+		{
+			std::list<uint8_t> container(testData.rng02.raw.begin(), testData.rng02.raw.end());
+			auto data = encode<std::vector<uint8_t>>(toHeader(testData.rng02.desc), container);
+			CHECK(data == testData.rng02.qoi);
 		}
 	}
 }
