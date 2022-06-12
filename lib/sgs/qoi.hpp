@@ -315,6 +315,11 @@ inline DataPair<TContainer> decode(const TContainer& qoiData)
 template<typename TOutContainer, typename TInContainer>
 TOutContainer encode(const Header& header, const TInContainer& rawData)
 {
+	if(rawData.size() < detail::rawBufferSize(header))
+	{
+		throw std::runtime_error{"insufficient data"};
+	}
+
 	TOutContainer data;
 	detail::reserve(data, detail::rawBufferSize(header));
 
@@ -332,7 +337,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 	data.push_back(static_cast<uint8_t>(header.colorspace));
 
 	const auto rawEnd = cend(rawData);
-	auto rawIt = cbegin(rawData); // TODO check rawData size
+	auto rawIt = cbegin(rawData);
 
 	std::array<detail::Pixel, detail::previousPixelsSize> previousPixels{};
 	detail::Pixel lastPixel{0, 0, 0, 255};
