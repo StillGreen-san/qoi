@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
-#include <stdexcept> // TODO do without?
+#include <stdexcept>
 #include <vector>
 
 // TODO constrain templates
@@ -23,6 +23,7 @@ constexpr size_t previousPixelsSize = 64;
 constexpr uint8_t tagRGB = 0b11111110;
 constexpr uint8_t tagRGBA = 0b11111111;
 constexpr uint8_t tagMask2 = 0b11000000;
+constexpr uint8_t dataMask2 = 0b00111111;
 constexpr uint8_t tagIndex = 0b00000000;
 constexpr uint8_t tagDiff = 0b01000000;
 constexpr uint8_t tagLuma = 0b10000000;
@@ -268,7 +269,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			break;
 		case detail::tagLuma:
 		{
-			const uint8_t greenDiff = static_cast<uint8_t>((qoiIt[0] & static_cast<uint8_t>(~detail::tagMask2)) - 32U);
+			const uint8_t greenDiff = static_cast<uint8_t>((qoiIt[0] & detail::dataMask2) - 32U);
 			lastPixel = detail::Pixel{
 			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
 			    static_cast<uint8_t>(lastPixel.green + greenDiff),
@@ -279,7 +280,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			break;
 		}
 		case detail::tagRun:
-			detail::push_back(dataPair, lastPixel, (qoiIt[0] & static_cast<uint8_t>(~detail::tagMask2)) + 1);
+			detail::push_back(dataPair, lastPixel, (qoiIt[0] & detail::dataMask2) + 1);
 			advance(qoiIt, 1);
 			break;
 		default:
@@ -355,8 +356,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 					break;
 				}
 			}
-			data.push_back(
-			    detail::tagRun | static_cast<uint8_t>(static_cast<uint8_t>(~detail::tagMask2) & (runCount - 1U)));
+			data.push_back(detail::tagRun | static_cast<uint8_t>(detail::dataMask2 & (runCount - 1U)));
 			continue;
 		}
 
@@ -364,7 +364,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 		if(previousPixels[idx] == currentPixel)
 		{
 			lastPixel = currentPixel;
-			data.push_back(detail::tagIndex | static_cast<uint8_t>(static_cast<size_t>(~detail::tagMask2) & idx));
+			data.push_back(detail::tagIndex | static_cast<uint8_t>(detail::dataMask2 & idx));
 			continue;
 		}
 
