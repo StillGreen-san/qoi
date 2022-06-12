@@ -321,7 +321,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 	}
 
 	TOutContainer data;
-	detail::reserve(data, detail::rawBufferSize(header));
+	detail::reserve(data, detail::qoiBufferSizeMin(header));
 
 	data.insert(end(data), std::cbegin(Header::magic), std::cend(Header::magic));
 
