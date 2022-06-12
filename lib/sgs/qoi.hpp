@@ -114,10 +114,32 @@ inline size_t qoiBufferSizeMin(const Header& header)
 
 struct Pixel
 {
-	uint8_t red;
-	uint8_t green;
-	uint8_t blue;
-	uint8_t alpha;
+	Pixel() = default;
+	Pixel(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) : red{red}, green{green}, blue{blue}, alpha{alpha}
+	{
+	}
+	template<typename TIter>
+	Pixel(TIter iter) :
+	    red{static_cast<uint8_t>(*iter++)}, green{static_cast<uint8_t>(*iter++)}, blue{static_cast<uint8_t>(*iter++)},
+	    alpha{static_cast<uint8_t>(*iter)}
+	{
+	}
+	template<typename TIter>
+	Pixel(TIter iter, uint8_t alpha) :
+	    red{static_cast<uint8_t>(*iter++)}, green{static_cast<uint8_t>(*iter++)}, blue{static_cast<uint8_t>(*iter)},
+	    alpha{alpha}
+	{
+	}
+	template<typename TIter>
+	Pixel(TIter iter, uint8_t alpha, const Header& header) :
+	    red{static_cast<uint8_t>(*iter++)}, green{static_cast<uint8_t>(*iter++)}, blue{static_cast<uint8_t>(*iter++)},
+	    alpha{header.channels == Channels::RGBA ? static_cast<uint8_t>(*iter) : alpha}
+	{
+	}
+	uint8_t red = 0;
+	uint8_t green = 0;
+	uint8_t blue = 0;
+	uint8_t alpha = 0;
 	[[nodiscard]] inline bool operator==(const Pixel rhs) const
 	{
 		return red == rhs.red && green == rhs.green && blue == rhs.blue && alpha == rhs.alpha;
@@ -231,14 +253,14 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 	auto qoiIt = std::next(cbegin(qoiData), detail::headerSize);
 
 	std::array<detail::Pixel, detail::previousPixelsSize> previousPixels{};
-	detail::Pixel lastPixel{0, 0, 0, 255};
+	detail::Pixel lastPixel(0, 0, 0, 255);
 
 	// TODO handle corrupted data (chunks of wrong size)
 	for(const size_t target = reservedSize; qoiIt != qoiEnd && dataPair.data.size() < target;)
 	{
 		if(qoiIt[0] == detail::tagRGB)
 		{
-			lastPixel = detail::Pixel{qoiIt[1], qoiIt[2], qoiIt[3], lastPixel.alpha};
+			lastPixel = detail::Pixel(std::next(qoiIt), lastPixel.alpha);
 			detail::push_back(dataPair, lastPixel);
 			previousPixels[detail::index(lastPixel)] = lastPixel;
 			advance(qoiIt, 4);
@@ -246,7 +268,7 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 		}
 		if(qoiIt[0] == detail::tagRGBA)
 		{
-			lastPixel = detail::Pixel{qoiIt[1], qoiIt[2], qoiIt[3], qoiIt[4]};
+			lastPixel = detail::Pixel(std::next(qoiIt));
 			detail::push_back(dataPair, lastPixel);
 			previousPixels[detail::index(lastPixel)] = lastPixel;
 			advance(qoiIt, 5);
@@ -260,9 +282,9 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 			advance(qoiIt, 1);
 			break;
 		case detail::tagDiff:
-			lastPixel = detail::Pixel{static_cast<uint8_t>(lastPixel.red + (((qoiIt[0] & 0b00110000U) >> 4U) - 2U)),
+			lastPixel = detail::Pixel(static_cast<uint8_t>(lastPixel.red + (((qoiIt[0] & 0b00110000U) >> 4U) - 2U)),
 			    static_cast<uint8_t>(lastPixel.green + (((qoiIt[0] & 0b00001100U) >> 2U) - 2U)),
-			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[0] & 0b00000011U) - 2U)), lastPixel.alpha};
+			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[0] & 0b00000011U) - 2U)), lastPixel.alpha);
 			detail::push_back(dataPair, lastPixel);
 			previousPixels[detail::index(lastPixel)] = lastPixel;
 			advance(qoiIt, 1);
@@ -270,10 +292,10 @@ DataPair<TOutContainer> decode(const TInContainer& qoiData)
 		case detail::tagLuma:
 		{
 			const uint8_t greenDiff = static_cast<uint8_t>((qoiIt[0] & detail::dataMask2) - 32U);
-			lastPixel = detail::Pixel{
+			lastPixel = detail::Pixel(
 			    static_cast<uint8_t>(lastPixel.red + (((qoiIt[1] & 0b11110000U) >> 4U) - 8U) + greenDiff),
 			    static_cast<uint8_t>(lastPixel.green + greenDiff),
-			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[1] & 0b00001111U) - 8U) + greenDiff), lastPixel.alpha};
+			    static_cast<uint8_t>(lastPixel.blue + ((qoiIt[1] & 0b00001111U) - 8U) + greenDiff), lastPixel.alpha);
 			detail::push_back(dataPair, lastPixel);
 			previousPixels[detail::index(lastPixel)] = lastPixel;
 			advance(qoiIt, 2);
@@ -340,12 +362,11 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 	auto rawIt = cbegin(rawData);
 
 	std::array<detail::Pixel, detail::previousPixelsSize> previousPixels{};
-	detail::Pixel lastPixel{0, 0, 0, 255};
+	detail::Pixel lastPixel(0, 0, 0, 255);
 
 	for(; rawIt != rawEnd; advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
 	{
-		const detail::Pixel currentPixel{
-		    rawIt[0], rawIt[1], rawIt[2], header.channels == Channels::RGBA ? rawIt[3] : lastPixel.alpha};
+		const detail::Pixel currentPixel(rawIt, lastPixel.alpha, header);
 
 		if(currentPixel == lastPixel)
 		{
@@ -354,8 +375,7 @@ TOutContainer encode(const Header& header, const TInContainer& rawData)
 			    ++runCount, advance(rawIt, static_cast<ptrdiff_t>(header.channels)))
 			{
 				auto rawNext = next(rawIt, static_cast<ptrdiff_t>(header.channels));
-				const detail::Pixel nextPixel{rawNext[0], rawNext[1], rawNext[2],
-				    header.channels == Channels::RGBA ? rawNext[3] : lastPixel.alpha};
+				const detail::Pixel nextPixel(rawNext, lastPixel.alpha, header);
 				if(nextPixel != currentPixel)
 				{
 					break;
