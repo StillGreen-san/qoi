@@ -19,9 +19,8 @@ option( ENABLE_IPO "enable link time optimization" ON )
 option( ENABLE_TESTS "build tests" OFF )
 option( ENABLE_BENCHMARK "build benchmark" OFF )
 
-include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerWarnings.cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectSettings.cmake )
-include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake )
+add_project_option_interface( project_options )
 
 include( FetchContent )
 
@@ -119,14 +118,13 @@ if( ENABLE_BENCHMARK )
     AddLib( pfusik_qoici_cpp_impl test/pfusik_qoici_cpp.cpp pfusik::qoici::cpp )
     AddLib( shadowmitia_libqoi_impl test/shadowmitia_libqoi.cpp shadowmitia::libqoi )
     AddLib( wx257osn2_qoixx_impl test/wx257osn2_qoixx.cpp wx257osn2::qoixx )
-    # TODO do not apply compiler warnings to external projects
     AddLib( shraiwi_miniqoi_c_impl test/shraiwi_miniqoi_c.cpp shraiwi::miniqoi::c )
     AddLib( shraiwi_miniqoi_cpp_impl test/shraiwi_miniqoi_cpp.cpp shraiwi::miniqoi::cpp )
 endif()
 
 if( ENABLE_TESTS )
     add_executable( ${PROJECT_NAME}_test test/catchmain.cpp test/testmain.cpp )
-    target_link_libraries( ${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME} test_data Catch2::Catch2 )
+    target_link_libraries( ${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME} test_data Catch2::Catch2 project_options )
     PostBuildImageCopy( ${PROJECT_NAME}_test qoi_test_images )
 endif()
 
@@ -139,7 +137,7 @@ if( ENABLE_BENCHMARK )
         shadowmitia_libqoi_impl
         pfusik_qoici_c_impl pfusik_qoici_cpp_impl
         phoboslab_qoi_impl )
-    target_link_libraries( bench PRIVATE Catch2::Catch2 qoi_test_images test_data )
+    target_link_libraries( bench PRIVATE Catch2::Catch2 qoi_test_images test_data project_options )
     PostBuildImageCopy( bench qoi_test_images )
 endif()
 
