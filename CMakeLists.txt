@@ -11,7 +11,6 @@ project( qoi
 set( PROJECT_QUALIFIED_NAME ${PROJECT_NAMESPACE}${PROJECT_NAME} )
 set( PROJECT_IMPORTED_NAME ${PROJECT_NAMESPACE}::${PROJECT_NAME} )
 
-option( WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF )
 option( ENABLE_CPPCHECK "Enable static analysis with cppcheck" OFF )
 option( ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF )
 option( ENABLE_INCLUDE_WHAT_YOU_USE "Enable static analysis with include-what-you-use" OFF )
