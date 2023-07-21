@@ -3,7 +3,13 @@ if(POLICY CMP0135)
 	cmake_policy(SET CMP0135 NEW)
 endif()
 
-project( qoi CXX C )
+set( PROJECT_NAMESPACE sgs )
+project( qoi
+		 VERSION 0.5.3
+		 HOMEPAGE_URL "https://github.com/StillGreen-san/qoi"
+		 LANGUAGES CXX )
+set( PROJECT_QUALIFIED_NAME ${PROJECT_NAMESPACE}${PROJECT_NAME} )
+set( PROJECT_IMPORTED_NAME ${PROJECT_NAMESPACE}::${PROJECT_NAME} )
 
 option( WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF )
 option( ENABLE_CPPCHECK "Enable static analysis with cppcheck" OFF )
@@ -94,17 +100,23 @@ if( ENABLE_BENCHMARK )
 	)
 endif()
 
-add_library( sgs_qoi INTERFACE )
-add_library( sgs::qoi ALIAS sgs_qoi )
-target_compile_features( sgs_qoi INTERFACE cxx_std_17 )
-target_include_directories( sgs_qoi INTERFACE lib )
+include( GNUInstallDirs )
+
+add_library( ${PROJECT_NAME} INTERFACE )
+add_library( ${PROJECT_IMPORTED_NAME} ALIAS ${PROJECT_NAME} )
+target_compile_features( ${PROJECT_NAME} INTERFACE cxx_std_17 )
+target_include_directories( ${PROJECT_NAME} INTERFACE
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+set_target_properties( ${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR} VERSION ${PROJECT_VERSION} )
 
 if( ENABLE_TESTS OR ENABLE_BENCHMARK )
 	AddLib( phoboslab_qoi_impl test/phoboslab_qoi.cpp phoboslab::qoi )
 	AddLib( test_data test/testdata.cpp phoboslab_qoi_impl )
 endif()
 if( ENABLE_BENCHMARK )
-	AddLib( stillgreensan_qoi_impl test/stillgreensan_qoi.cpp sgs::qoi )
+	AddLib( stillgreensan_qoi_impl test/stillgreensan_qoi.cpp ${PROJECT_NAME} )
 	AddLib( pfusik_qoici_c_impl test/pfusik_qoici_c.cpp pfusik::qoici::c )
 	AddLib( pfusik_qoici_cpp_impl test/pfusik_qoici_cpp.cpp pfusik::qoici::cpp )
 	AddLib( shadowmitia_libqoi_impl test/shadowmitia_libqoi.cpp shadowmitia::libqoi )
@@ -115,9 +127,9 @@ if( ENABLE_BENCHMARK )
 endif()
 
 if( ENABLE_TESTS )
-	add_executable( sgs_qoi_test test/catchmain.cpp test/testmain.cpp )
-	target_link_libraries( sgs_qoi_test PRIVATE sgs::qoi test_data Catch2::Catch2 )
-	PostBuildImageCopy( sgs_qoi_test qoi_test_images )
+	add_executable( ${PROJECT_NAME}_test test/catchmain.cpp test/testmain.cpp )
+	target_link_libraries( ${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME} test_data Catch2::Catch2 )
+	PostBuildImageCopy( ${PROJECT_NAME}_test qoi_test_images )
 endif()
 
 if( ENABLE_BENCHMARK )
@@ -132,3 +144,33 @@ if( ENABLE_BENCHMARK )
 	target_link_libraries( bench PRIVATE Catch2::Catch2 qoi_test_images test_data )
 	PostBuildImageCopy( bench qoi_test_images )
 endif()
+
+include( CMakePackageConfigHelpers )
+
+configure_file( ${PROJECT_SOURCE_DIR}/cmake/pkg-config.pc.in ${PROJECT_BINARY_DIR}/${PROJECT_QUALIFIED_NAME}.pc @ONLY )
+
+configure_package_config_file(
+		${PROJECT_SOURCE_DIR}/cmake/config.cmake.in
+		${PROJECT_BINARY_DIR}/${PROJECT_QUALIFIED_NAME}Config.cmake
+		INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_QUALIFIED_NAME}
+		NO_SET_AND_CHECK_MACRO )
+
+write_basic_package_version_file( ${PROJECT_QUALIFIED_NAME}ConfigVersion.cmake
+		VERSION ${PROJECT_VERSION}
+		COMPATIBILITY SameMajorVersion )
+
+install( TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_QUALIFIED_NAME}_Targets )
+
+install( EXPORT ${PROJECT_QUALIFIED_NAME}_Targets
+		 FILE ${PROJECT_QUALIFIED_NAME}Targets.cmake
+		 DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_QUALIFIED_NAME}
+		 NAMESPACE ${PROJECT_NAMESPACE}:: )
+
+install( DIRECTORY ${PROJECT_SOURCE_DIR}/inc/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
+
+install( FILES ${PROJECT_BINARY_DIR}/${PROJECT_QUALIFIED_NAME}.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig )
+
+install( FILES
+		 ${PROJECT_BINARY_DIR}/${PROJECT_QUALIFIED_NAME}Config.cmake
+		 ${PROJECT_BINARY_DIR}/${PROJECT_QUALIFIED_NAME}ConfigVersion.cmake
+		 DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_QUALIFIED_NAME} )
